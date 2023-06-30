@@ -70,7 +70,7 @@ class bishop:
 
             while inRange and unBlocked:
                 try:
-                    if board[(position[0] + increment)][(position[1] + increment)] <= 0:
+                    if board[(position[0] + increment)][(position[1] + increment)] >= 0:
                         bishop_moves.append([(position[0] + increment), (position[1] + increment)])
                         if board[(position[0] + increment)][(position[1] + increment)] != 0:
                             unBlocked = False
@@ -87,10 +87,32 @@ class bishop:
 
             while inRange and unBlocked:
                 try:
-                    if board[(position[0] + increment2)][(position[1] + increment2)] <= 0:
+                    if board[(position[0] + increment2)][(position[1] + increment2)] >= 0:
                         bishop.append([(position[0] + increment2), (position[1] + increment2)])
+                        if board[(position[0] + increment2)][(position[1] + increment2)] != 0:
+                            unBlocked = False
+                            if board[(position[0] + increment2)][(position[1] + increment2)] > 0:
+                                bishop_moves.append([(position[0] + increment2), (position[1] + increment2)])
+                    increment -= 1
                 except:
                     inRange = False
+
+            inRange = True
+            unBlocked = True
+            increment = 1
+            increment2 = -1
+
+            while inRange and unBlocked:
+                try:
+                    if board[(position[0] + increment2)][(position[1] + increment)] >= 0:
+                        bishop.append([(position[0] + increment2), (position[1] + increment2)])
+                        if board[(position[0] + increment2)][(position[1] + increment2)] != 0:
+                            unBlocked = False
+                            if board[(position[0] + increment2)][(position[1] + increment2)] > 0:
+                                bishop_moves.append([(position[0] + increment2), (position[1] + increment2)])
+                    increment -= 1
+                except:
+                    inRange = False           
 h1 = pawn(1)
 h1_moves = h1.legal_moves([6, 7])
 print(h1_moves)
