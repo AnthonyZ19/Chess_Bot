@@ -61,79 +61,124 @@ class bishop:
         self.side = color
 
     def legal_moves(self, position):
+        # Stores the legal moves for the bishop
         bishop_moves = []
 
+        # Checks moves for when the piece is white
         if self.side == -1:
+            # Variables used to track how far the bishop can move
             inRange = True
             unBlocked = True
             increment = 1
 
+            # Repeatedly checks if the bishop can move to each square it can see based on the previous variables
             while inRange and unBlocked:
+                # Try is used to prevent error in case the position that is being checked is out of range and stops the loop
                 try:
+                    # Checks if the spot is unoccupied or occupied by an enemy piece
                     if board[(position[0] + increment)][(position[1] + increment)] >= 0:
+                        # Adds the spot to the list of legal moves
                         bishop_moves.append([(position[0] + increment), (position[1] + increment)])
                         
+                    # Checks if the spot is empty
                     if board[(position[0] + increment)][(position[1] + increment)] != 0:
+                        # Takes note that the bishop is blocked in this direction and can't see further
                         unBlocked = False
+                        # Checks if the piece blocking is an enemy piece
                         if board[(position[0] + increment)][(position[1] + increment)] > 0:
+                            # Adds the moves to the list of legal moves since the bishop can take it
                             bishop_moves.append([(position[0] + increment), (position[1] + increment)])
                     increment += 1
                 except:
                     inRange = False
 
 
+            # Variables to track the bishop's range are reset and a new one is used to for when it goes in the other direction on the same diagonal
             inRange = True
             unBlocked = True
-            increment2 = -1
+            increment = 1
 
+            # Repeatedly checks if the bishop can move to each square it can see based on the previous variables
             while inRange and unBlocked:
+                # Try is used to prevent error in case the position that is being checked is out of range and stops the loop
                 try:
-                    if board[(position[0] + increment2)][(position[1] + increment2)] >= 0:
-                        bishop.append([(position[0] + increment2), (position[1] + increment2)])
+                    if ((position[0] - increment) >= 0) and ((position[1] - increment) >= 0):
+                        # Checks if the spot is unoccupied or occupied by an enemy piece
+                        if board[(position[0] - increment)][(position[1] - increment)] >= 0:
+                            # Adds the spot to the list of legal moves
+                            bishop_moves.append([(position[0] - increment), (position[1] - increment)])
 
-                    if board[(position[0] + increment2)][(position[1] + increment2)] != 0:
-                        unBlocked = False
-                        if board[(position[0] + increment2)][(position[1] + increment2)] > 0:
-                            bishop_moves.append([(position[0] + increment2), (position[1] + increment2)])
-                    increment2 -= 1
+                        # Checks if the spot is empty
+                        if board[(position[0] - increment)][(position[1] - increment)] != 0:
+                            # Takes note that the bishop is blocked in this direction and can't see further
+                            unBlocked = False
+                            # Checks if the piece blocking is an enemy piece
+                            if board[(position[0] - increment)][(position[1] - increment)] > 0:
+                                # Adds the moves to the list of legal moves since the bishop can take it
+                                bishop_moves.append([(position[0] - increment), (position[1] - increment)])
+                        increment += 1
+                    else:
+                        inRange = False
                 except:
                     inRange = False
 
+            # Variables to track the bishop's range are reset
             inRange = True
             unBlocked = True
             increment = 1
-            increment2 = -1
 
+            # Repeatedly checks if the bishop can move to each square it can see based on the previous variables
             while inRange and unBlocked:
+                # Try is used to prevent error in case the position that is being checked is out of range and stops the loop
                 try:
-                    if board[(position[0] + increment2)][(position[1] + increment)] >= 0:
-                        bishop.append([(position[0] + increment2), (position[1] + increment)])
+                    if ((position[0] - increment) >= 0):
+                        # Checks if the spot is unoccupied or occupied by an enemy piece
+                        if board[(position[0] - increment)][(position[1] + increment)] >= 0:
+                            # Adds the spot to the list of legal moves
+                            bishop_moves.append([(position[0] - increment), (position[1] + increment)])
 
-                    if board[(position[0] + increment2)][(position[1] + increment)] != 0:
-                        unBlocked = False
-                        if board[(position[0] + increment2)][(position[1] + increment)] > 0:
-                            bishop_moves.append([(position[0] + increment2), (position[1] + increment)])
-                    increment += 1
-                    increment2 -= 1
+                        # Checks if the spot is empty
+                        if board[(position[0] - increment)][(position[1] + increment)] != 0:
+                            # Takes note that the bishop is blocked in this direction and can't see further
+                            unBlocked = False
+                            # Checks if the piece blocking is an enemy piece
+                            if board[(position[0] - increment)][(position[1] + increment)] > 0:
+                                # Adds the moves to the list of legal moves since the bishop can take it
+                                bishop_moves.append([(position[0] - increment), (position[1] + increment)])
+                        increment += 1
+                    else:
+                        inRange = False
                 except:
                     inRange = False  
 
+            # Variables to track the bishop's range are reset
             inRange = True
             unBlocked = True
             increment = 1
-            increment2 = -1
 
+            # Repeatedly checks if the bishop can move to each square it can see based on the previous variables
             while inRange and unBlocked:
+                # Try is used to prevent error in case the position that is being checked is out of range and stops the loop
                 try:
-                    if board[(position[0] + increment)][(position[1] + increment2)] >= 0:
-                        bishop.append([(position[0] + increment), (position[1] + increment2)])
+                    if ((position[1] - increment) >= 0):
+                        # Checks if the spot is unoccupied or occupied by an enemy piece
+                        if board[(position[0] + increment)][(position[1] - increment)] >= 0:
+                            # Adds the spot to the list of legal moves
+                            bishop_moves.append([(position[0] + increment), (position[1] - increment)])
 
-                    if board[(position[0] + increment)][(position[1] + increment2)] != 0:
-                        unBlocked = False
-                        if board[(position[0] + increment)][(position[1] + increment2)] > 0:
-                            bishop_moves.append([(position[0] + increment), (position[1] + increment2)])
-                    increment += 1
-                    increment2 -= 1
+                        # Checks if the spot is empty
+                        if board[(position[0] + increment)][(position[1] - increment)] != 0:
+                            # Takes note that the bishop is blocked in this direction and can't see further
+                            unBlocked = False
+                            """
+                            # Checks if the piece blocking is an enemy piece
+                            if board[(position[0] + increment)][(position[1] - increment)] > 0:
+                                # Adds the moves to the list of legal moves since the bishop can take it
+                                bishop_moves.append([(position[0] + increment), (position[1] - increment)])
+                            """
+                        increment += 1
+                    else:
+                        inRange = False
                 except:
                     inRange = False
             
