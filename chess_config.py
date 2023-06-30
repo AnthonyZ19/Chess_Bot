@@ -1,11 +1,11 @@
 board = [[-5, -3, -3.25, -9, -10, -3.25, -3, -5],
-         [-1, -1, -1, -1,  -1, -1, -1, -1],
-         [0, 0, 0, 0,  0, 0, 0, 0],
-         [0, 0, 0, 0,  0, 0, 0, 0],
-         [0, 0, 0, 0,  0, 0, 0, 0],
-         [0, 0, 0, 0,  0, 0, 0, 0],
-         [1, 1, 1, 1,  1, 1, 1, 1],
-         [5, 3, 3.25, 9, 10, 3.25, 3, 5]]
+         [-1, -1, -1,    -1,  -1, -1,    -1, -1],
+         [0,  0,   0,     0,   0,  0,     0,  0],
+         [0,  0,   0,     0,   0,  0,     0,  0],
+         [0,  0,   0,     0,   0,  0,     0,  0],
+         [0,  0,   0,     0,   0,  0,     0,  0],
+         [1,  1,   1,     1,   1,  1,     1,  1],
+         [5,  3, 3.25,    9,  10, 3.25,   3,  5]]
 
 
 class pawn:
@@ -72,10 +72,11 @@ class bishop:
                 try:
                     if board[(position[0] + increment)][(position[1] + increment)] >= 0:
                         bishop_moves.append([(position[0] + increment), (position[1] + increment)])
-                        if board[(position[0] + increment)][(position[1] + increment)] != 0:
-                            unBlocked = False
-                            if board[(position[0] + increment)][(position[1] + increment)] > 0:
-                                bishop_moves.append([(position[0] + increment), (position[1] + increment)])
+                        
+                    if board[(position[0] + increment)][(position[1] + increment)] != 0:
+                        unBlocked = False
+                        if board[(position[0] + increment)][(position[1] + increment)] > 0:
+                            bishop_moves.append([(position[0] + increment), (position[1] + increment)])
                     increment += 1
                 except:
                     inRange = False
@@ -89,11 +90,12 @@ class bishop:
                 try:
                     if board[(position[0] + increment2)][(position[1] + increment2)] >= 0:
                         bishop.append([(position[0] + increment2), (position[1] + increment2)])
-                        if board[(position[0] + increment2)][(position[1] + increment2)] != 0:
-                            unBlocked = False
-                            if board[(position[0] + increment2)][(position[1] + increment2)] > 0:
-                                bishop_moves.append([(position[0] + increment2), (position[1] + increment2)])
-                    increment -= 1
+
+                    if board[(position[0] + increment2)][(position[1] + increment2)] != 0:
+                        unBlocked = False
+                        if board[(position[0] + increment2)][(position[1] + increment2)] > 0:
+                            bishop_moves.append([(position[0] + increment2), (position[1] + increment2)])
+                    increment2 -= 1
                 except:
                     inRange = False
 
@@ -105,14 +107,39 @@ class bishop:
             while inRange and unBlocked:
                 try:
                     if board[(position[0] + increment2)][(position[1] + increment)] >= 0:
-                        bishop.append([(position[0] + increment2), (position[1] + increment2)])
-                        if board[(position[0] + increment2)][(position[1] + increment2)] != 0:
-                            unBlocked = False
-                            if board[(position[0] + increment2)][(position[1] + increment2)] > 0:
-                                bishop_moves.append([(position[0] + increment2), (position[1] + increment2)])
-                    increment -= 1
+                        bishop.append([(position[0] + increment2), (position[1] + increment)])
+
+                    if board[(position[0] + increment2)][(position[1] + increment)] != 0:
+                        unBlocked = False
+                        if board[(position[0] + increment2)][(position[1] + increment)] > 0:
+                            bishop_moves.append([(position[0] + increment2), (position[1] + increment)])
+                    increment += 1
+                    increment2 -= 1
                 except:
-                    inRange = False           
-h1 = pawn(1)
-h1_moves = h1.legal_moves([6, 7])
+                    inRange = False  
+
+            inRange = True
+            unBlocked = True
+            increment = 1
+            increment2 = -1
+
+            while inRange and unBlocked:
+                try:
+                    if board[(position[0] + increment)][(position[1] + increment2)] >= 0:
+                        bishop.append([(position[0] + increment), (position[1] + increment2)])
+
+                    if board[(position[0] + increment)][(position[1] + increment2)] != 0:
+                        unBlocked = False
+                        if board[(position[0] + increment)][(position[1] + increment2)] > 0:
+                            bishop_moves.append([(position[0] + increment), (position[1] + increment2)])
+                    increment += 1
+                    increment2 -= 1
+                except:
+                    inRange = False
+            
+            return bishop_moves
+
+
+h1 = bishop(-1)
+h1_moves = h1.legal_moves([0, 2])
 print(h1_moves)
