@@ -1,5 +1,5 @@
 board = [[-5, -3, -3.25, -9, -10, -3.25, -3, -5],
-         [-1, 1, -1,    -1,  -1, -1,    -1, -1],
+         [-1, 1,  -1,    -1,  -1, -1,    -1, -1],
          [0,  0,   0,     0,   0,  0,     0,  0],
          [0,  0,   0,     0,   0,  0,     0,  0],
          [0,  0,   0,     0,   0,  0,     0,  0],
@@ -265,6 +265,70 @@ class bishop:
             return bishop_moves
 
 
-h1 = bishop(1)
-h1_moves = h1.legal_moves([7, 2])
+class knight:
+    def __init__(self, color):
+        # "color" is -1 for black and 1 for white
+        self.side = color
+    def legal_moves(self, position):
+        # Stores legal moves for the knight
+        knight_moves = []
+
+        # Checks legal moves for a black knight 
+        if self.side == -1:
+            # Checks legal moves in which the knight moves by 2 vertically
+            for y in [2, -2]:
+                for x in [1, -1]:
+                    # Try in case the position is out of range
+                    try:
+                        # Makes sure that the index isn't negative
+                        if ((position[0] + y) >= 0) and ((position[1] + x) >= 0):
+                            if board[(position[0] + y)][position[1] + x] >= 0:
+                                # If the square is empty and not another black piece the move is appended
+                                knight_moves.append([(position[0] + y), (position[1] + x)])
+                    except:
+                        continue
+
+            # Checks legal moves in which the knight moves by 2 vertically
+            for x in [2, -2]:
+                for y in [1, -1]:
+                    # Try in case the position is out of range
+                    try:
+                        # Makes sure that the index isn't negative
+                        if ((position[0] + y) >= 0) and ((position[1] + x) >= 0):
+                            if board[(position[0] + y)][position[1] + x] >= 0:
+                                # If the square is empty and not another black piece the move is appended
+                                knight_moves.append([(position[0] + y), (position[1] + x)])
+                    except:
+                        continue
+        else:
+            # Checks legal moves in which the knight moves by 2 vertically
+            for y in [2, -2]:
+                for x in [1, -1]:
+                    # Try in case the position is out of range
+                    try:
+                        # Makes sure that the index isn't negative
+                        if ((position[0] + y) >= 0) and ((position[1] + x) >= 0):
+                            if board[(position[0] + y)][position[1] + x] <= 0:
+                                # If the square is empty and not another black piece the move is appended
+                                knight_moves.append([(position[0] + y), (position[1] + x)])
+                    except:
+                        continue
+
+            # Checks legal moves in which the knight moves by 2 vertically
+            for x in [2, -2]:
+                for y in [1, -1]:
+                    # Try in case the position is out of range
+                    try:
+                        # Makes sure that the index isn't negative
+                        if ((position[0] + y) >= 0) and ((position[1] + x) >= 0):
+                            if board[(position[0] + y)][position[1] + x] <= 0:
+                                # If the square is empty and not another black piece the move is appended
+                                knight_moves.append([(position[0] + y), (position[1] + x)])
+                    except:
+                        continue
+        return knight_moves
+
+                
+h1 = knight(1)
+h1_moves = h1.legal_moves([7, 1])
 print(h1_moves)
