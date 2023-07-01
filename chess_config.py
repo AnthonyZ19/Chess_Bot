@@ -1,7 +1,7 @@
-board = [[-5, -3, -3.25, -9, -10, -3.25, -3, -5],
-         [-1, 1,  -1,    -1,  -1, -1,    -1, -1],
+board = [[-5, 0, -3.25, -9, -10, -3.25, -3, -5],
+         [0,-1,  -1,    -1,  -1, -1,    -1, -1],
          [0,  0,   0,     0,   0,  0,     0,  0],
-         [0,  0,   0,     0,   0,  0,     0,  0],
+         [0,  0,   0,     -3.,   0,  0,     0,  0],
          [0,  0,   0,     0,   0,  0,     0,  0],
          [0,  0,   0,     0,   0,  0,     0,  0],
          [1,  1,   1,     1,   1,  1,     1,  1],
@@ -66,13 +66,10 @@ class bishop:
 
         # Checks moves for when the piece is white
         if self.side == -1:
-            # Variables used to track how far the bishop can move
-            inRange = True
-            unBlocked = True
             increment = 1
 
             # Repeatedly checks if the bishop can move to each square it can see based on the previous variables
-            while inRange and unBlocked:
+            while True:
                 # Try is used to prevent error in case the position that is being checked is out of range and stops the loop
                 try:
                     # Checks if the spot is unoccupied or occupied by an enemy piece
@@ -82,20 +79,16 @@ class bishop:
                         
                     # Checks if the spot is empty
                     if board[(position[0] + increment)][(position[1] + increment)] != 0:
-                        # Takes note that the bishop is blocked in this direction and can't see further
-                        unBlocked = False
+                        break
                     increment += 1
                 except:
-                    inRange = False
+                    break
 
 
-            # Variables to track the bishop's range are reset and a new one is used to for when it goes in the other direction on the same diagonal
-            inRange = True
-            unBlocked = True
             increment = 1
 
             # Repeatedly checks if the bishop can move to each square it can see based on the previous variables
-            while inRange and unBlocked:
+            while True:
                 # Try is used to prevent error in case the position that is being checked is out of range and stops the loop
                 try:
                     if ((position[0] - increment) >= 0) and ((position[1] - increment) >= 0):
@@ -106,21 +99,17 @@ class bishop:
 
                         # Checks if the spot is empty
                         if board[(position[0] - increment)][(position[1] - increment)] != 0:
-                            # Takes note that the bishop is blocked in this direction and can't see further
-                            unBlocked = False
+                            break
                         increment += 1
                     else:
-                        inRange = False
+                        break
                 except:
-                    inRange = False
+                    break
 
-            # Variables to track the bishop's range are reset
-            inRange = True
-            unBlocked = True
             increment = 1
 
             # Repeatedly checks if the bishop can move to each square it can see based on the previous variables
-            while inRange and unBlocked:
+            while True:
                 # Try is used to prevent error in case the position that is being checked is out of range and stops the loop
                 try:
                     if ((position[0] - increment) >= 0):
@@ -131,21 +120,17 @@ class bishop:
 
                         # Checks if the spot is empty
                         if board[(position[0] - increment)][(position[1] + increment)] != 0:
-                            # Takes note that the bishop is blocked in this direction and can't see further
-                            unBlocked = False
+                            break
                         increment += 1
                     else:
-                        inRange = False
+                        break
                 except:
-                    inRange = False  
+                    break
 
-            # Variables to track the bishop's range are reset
-            inRange = True
-            unBlocked = True
             increment = 1
 
             # Repeatedly checks if the bishop can move to each square it can see based on the previous variables
-            while inRange and unBlocked:
+            while True:
                 # Try is used to prevent error in case the position that is being checked is out of range and stops the loop
                 try:
                     if ((position[1] - increment) >= 0):
@@ -156,22 +141,18 @@ class bishop:
 
                         # Checks if the spot is empty
                         if board[(position[0] + increment)][(position[1] - increment)] != 0:
-                            # Takes note that the bishop is blocked in this direction and can't see further
-                            unBlocked = False
+                            break
                         increment += 1
                     else:
-                        inRange = False
+                        break
                 except:
-                    inRange = False
+                    break
 
         else:
-            # Variables used to track how far the bishop can move
-            inRange = True
-            unBlocked = True
             increment = 1
 
             # Repeatedly checks if the bishop can move to each square it can see based on the previous variables
-            while inRange and unBlocked:
+            while True:
                 # Try is used to prevent error in case the position that is being checked is out of range and stops the loop
                 try:
                     # Checks if the spot is unoccupied or occupied by an enemy piece
@@ -181,19 +162,15 @@ class bishop:
                              
                     # Checks if the spot is empty
                     if board[(position[0] + increment)][(position[1] + increment)] != 0:
-                        # Takes note that the bishop is blocked in this direction and can't see further
-                        unBlocked = False
+                        break
                     increment += 1
                 except:
-                    inRange = False
+                    break
 
-            # Variables to track the bishop's range are reset and a new one is used to for when it goes in the other direction on the same diagonal
-            inRange = True
-            unBlocked = True
             increment = 1
 
             # Repeatedly checks if the bishop can move to each square it can see based on the previous variables
-            while inRange and unBlocked:
+            while True:
                 # Try is used to prevent error in case the position that is being checked is out of range and stops the loop
                 try:
                     if ((position[0] - increment) >= 0) and ((position[1] - increment) >= 0):
@@ -204,21 +181,17 @@ class bishop:
 
                         # Checks if the spot is empty
                         if board[(position[0] - increment)][(position[1] - increment)] != 0:
-                            # Takes note that the bishop is blocked in this direction and can't see further
-                            unBlocked = False
+                            break
                         increment += 1
                     else:
-                        inRange = False
+                        break
                 except:
-                    inRange = False
+                    break
 
-            # Variables to track the bishop's range are reset
-            inRange = True
-            unBlocked = True
             increment = 1
 
             # Repeatedly checks if the bishop can move to each square it can see based on the previous variables
-            while inRange and unBlocked:
+            while True:
                 # Try is used to prevent error in case the position that is being checked is out of range and stops the loop
                 try:
                     if ((position[0] - increment) >= 0):
@@ -229,21 +202,19 @@ class bishop:
 
                         # Checks if the spot is empty
                         if board[(position[0] - increment)][(position[1] + increment)] != 0:
-                            # Takes note that the bishop is blocked in this direction and can't see further
-                            unBlocked = False
+                            break
                         increment += 1
                     else:
-                        inRange = False
+                        #inRange = False
+                        break
                 except:
-                    inRange = False  
+                    #inRange = False  
+                    break
 
-            # Variables to track the bishop's range are reset
-            inRange = True
-            unBlocked = True
             increment = 1
 
             # Repeatedly checks if the bishop can move to each square it can see based on the previous variables
-            while inRange and unBlocked:
+            while True:
                 # Try is used to prevent error in case the position that is being checked is out of range and stops the loop
                 try:
                     if ((position[1] - increment) >= 0):
@@ -254,15 +225,14 @@ class bishop:
 
                         # Checks if the spot is empty
                         if board[(position[0] + increment)][(position[1] - increment)] != 0:
-                            # Takes note that the bishop is blocked in this direction and can't see further
-                            unBlocked = False
+                            break
                         increment += 1
                     else:
-                        inRange = False
+                        break
                 except:
-                    inRange = False
+                    break
                         
-            return bishop_moves
+        return bishop_moves
 
 
 class knight:
@@ -328,7 +298,102 @@ class knight:
                         continue
         return knight_moves
 
-                
-h1 = knight(1)
-h1_moves = h1.legal_moves([7, 1])
+
+class rook:
+    def __init__(self, color):
+        # "color" is -1 for black and 1 for white
+        self.side = color
+    def legal_moves(self, position):
+        # Stores legal moves for the rook
+        rook_moves = []
+
+        if self.side == -1:
+            # Checks moves forward(1) and backwards(-1), left(-1) and right(1)
+            for direction in [1, -1]:
+                increment = direction
+
+                # Checks all legal moves vertically or in the y plane
+                while True:
+                    try:
+                        # Ensures that the index isn't negative
+                        if (position[0] + increment) >= 0:
+                            # If the next spot on the board is unoccupied  or occupied by an enemy piece it's added as a legal move
+                            if board[(position[0] + increment)][position[1]] >= 0:
+                                rook_moves.append([(position[0] + increment), position[1]])
+                            # Checks if the position is occupied to prevent the rook from jumping over pieces
+                            if board[(position[0] + increment)][position[1]] != 0:
+                                break
+                        else:
+                            break
+                    except:
+                        break
+
+                    increment += direction
+
+                increment = direction
+
+                # Checks all legal moves horizontally or in the x plane
+                while True:
+                    try:
+                        # Ensures that the index isn't negative
+                        if (position[1] + increment) >= 0:
+                            # If the next spot on the board is unoccupied  or occupied by an enemy piece it's added as a legal move
+                            if board[position[0]][(position[1] + increment)] >= 0:
+                                rook_moves.append([position[0], (position[1] + increment)])
+                                # Checks if the position is occupied to prevent the rook from jumping over pieces
+                            if board[position[0]][(position[1] + increment)] != 0:
+                                break
+                        else:
+                            break
+                    except:
+                        break
+
+                    increment += direction
+        else:
+            # Checks moves forward(1) and backwards(-1), left(-1) and right(1)
+            for direction in [1, -1]:
+                increment = direction
+
+                # Checks all legal moves vertically or in the y plane
+                while True:
+                    try:
+                        # Ensures that the index isn't negative
+                        if (position[0] + increment) >= 0:
+                            # If the next spot on the board is unoccupied  or occupied by an enemy piece it's added as a legal move
+                            if board[(position[0] + increment)][position[1]] <= 0:
+                                rook_moves.append([(position[0] + increment), position[1]])
+                            # Checks if the position is occupied to prevent the rook from jumping over pieces
+                            if board[(position[0] + increment)][position[1]] != 0:
+                                break
+                        else:
+                            break
+                    except:
+                        break
+
+                    increment += direction
+
+                increment = direction
+
+                # Checks all legal moves horizontally or in the x plane
+                while True:
+                    try:
+                        # Ensures that the index isn't negative
+                        if (position[1] + increment) >= 0:
+                            # If the next spot on the board is unoccupied  or occupied by an enemy piece it's added as a legal move
+                            if board[position[0]][(position[1] + increment)] <= 0:
+                                rook_moves.append([position[0], (position[1] + increment)])
+                                # Checks if the position is occupied to prevent the rook from jumping over pieces
+                            if board[position[0]][(position[1] + increment)] != 0:
+                                break
+                        else:
+                            break
+                    except:
+                        break
+
+                    increment += direction
+        return rook_moves
+
+                      
+h1 = bishop(-1)
+h1_moves = h1.legal_moves([3, 3])
 print(h1_moves)
