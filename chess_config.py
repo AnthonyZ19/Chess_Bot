@@ -1,7 +1,7 @@
 board = [[-5, -3, -3.25, -9, -10, -3.25, -3, -5],
          [-1,-1,  -1,    -1,  -1, -1,    -1, -1],
          [0,  0,   0,     0,   0,  0,     0,  0],
-         [0,  0,   0,     0.,  0,  0,     0,  0],
+         [0,  0,   0,     9.,  0,  0,     0,  0],
          [0,  0,   0,     0,   0,  0,     0,  0],
          [0,  0,   0,     0,   0,  0,     0,  0],
          [1,  1,   1,     1,   1,  1,     1,  1],
@@ -393,7 +393,28 @@ class rook:
                     increment += direction
         return rook_moves
 
-                      
-h1 = bishop(-1)
+
+class queen:
+    def __init__(self, color):
+        # "color" is -1 for black and 1 for white
+        self.side = color
+    def legal_moves(self, position):
+        queen_moves = []
+
+        # Since the queen moves like a bishop and rook combined, I just call their classes and combine the legal moves for both
+        bishop1 = bishop(self.side)
+        rook1 = rook(self.side)
+
+        # Stores the legal moves of the queen as if it were a bishop and rook
+        bishop_moves = bishop1.legal_moves(position)
+        rook_moves = rook1.legal_moves(position)
+        
+        # Combines the moves into a list of legal moves for the queen
+        for moves in [bishop_moves, rook_moves]:
+            for move in moves:
+                queen_moves.append(move)
+
+        return queen_moves
+h1 = queen(-1)
 h1_moves = h1.legal_moves([3, 3])
 print(h1_moves)
