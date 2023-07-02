@@ -1,7 +1,7 @@
 board = [[-5, -3, -3.25, -9, -10, -3.25, -3, -5],
          [-1,-1,  -1,    -1,  -1, -1,    -1, -1],
          [0,  0,   0,     0,   0,  0,     0,  0],
-         [0,  0,   0,     9.,  0,  0,     0,  0],
+         [0,  0,   0,     0,   0,  0,     0,  0],
          [0,  0,   0,     0,   0,  0,     0,  0],
          [0,  0,   0,     0,   0,  0,     0,  0],
          [1,  1,   1,     1,   1,  1,     1,  1],
@@ -415,6 +415,94 @@ class queen:
                 queen_moves.append(move)
 
         return queen_moves
+
+
+class king:
+    def __init__(self, color):
+        # "color" is -1 for black and 1 for white
+        self.side = color
+    def legal_moves(self, position):
+        king_moves = []
+        return king_moves
+
+def piece_caller(value):
+    if value == 1:
+        return pawn(1)
+    elif value == -1:
+        return pawn(-1)
+    elif value == 3:
+        return knight(1)
+    elif value == -3:
+        return knight(-1)
+    elif value == 3.25:
+        return bishop(1)
+    elif value == -3.25:
+        return bishop(-1)
+    elif value == 5:
+        return rook(1)
+    elif value == -5:
+        return rook(-1)
+    elif value == 9:
+        return queen(1)
+    elif value == -9:
+        return queen(-1)
+    elif value == 10:
+        return king(1)
+    elif value == -10:
+        return king(-1)
+    
+
+def attacks(color, board_state):
+    # Stores position attacked
+    attacked = []
+    # Tracks what row is being checked
+    row_index = 0
+
+    # Checks attacks for the black pieces
+    if color < 0:
+        for row in board_state:
+            # Tracks the column being checked per row
+            square_index = 0
+            for square in row:
+                # Ensures that it's a black piece
+                if square < 0:
+                    # Gets and stores the moves of the piece
+                    moves = piece_caller(square).legal_moves([row_index, square_index])
+                    
+                    # Ensures the list isn't empty
+                    if moves:
+                        for move in moves:
+                            # Ensures the list isn't empty
+                            if move:
+                                # Checks if it's an enemy piece that can be taken
+                                if board_state[move[0]][move[1]] > 0:
+                                    attacked.append(move)
+                    square_index += 1
+            row_index += 1
+    else:
+        for row in board_state:
+            # Tracks the column being checked per row
+            square_index = 0
+            for square in row:
+                # Ensures that it's a white piece
+                if square > 0:
+                    # Gets and stores the moves of the piece
+                    moves = piece_caller(square).legal_moves([row_index, square_index])
+                    
+                    # Ensures the list isn't empty
+                    if moves:
+                        for move in moves:
+                            # Ensures the list isn't empty
+                            if move:
+                                # Checks if it's an enemy piece that can be taken
+                                if board_state[move[0]][move[1]] < 0:
+                                    attacked.append(move)
+                    square_index += 1
+            row_index += 1
+    return attacked
+
+
 h1 = queen(-1)
 h1_moves = h1.legal_moves([3, 3])
-print(h1_moves)
+#print(h1_moves)
+print(attacks(-1, board))
