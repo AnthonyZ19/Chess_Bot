@@ -463,6 +463,38 @@ class king:
                                 # Checks if the square is attacked by enemy pieces
                                 if not in_check(board_state, self, position, [(position[0] + y), (position[1] + x)]):
                                     king_moves.append([(position[0] + y), (position[1] + x)])
+
+            # Checks if the king can castle
+            if not(self.black_king_moved):
+                # Checks long castle
+                if not(self.rook_a8_moved):
+                    if (board_state[position[0]][position[1] - 1] == 0) and (board_state[position[0]][position[1] - 2] == 0) and (board_state[position[0]][position[1] - 3] == 0):
+                        king_moves.append([position[0], (position[1] - 2)])
+                # Checks short castle
+                if not(self.rook_h8_moved):
+                    if (board_state[position[0]][position[1] + 1] == 0) and (board_state[position[0]][position[1] + 2] == 0):
+                        king_moves.append([position[0], (position[1] + 2)])
+        else:
+            # Loops through all the squares around the king
+            for y in [-1, 0, 1]:
+                for x in [-1, 0, 1]:
+                    if ((position[0] + y) >= 0) and ((position[0] + y) < 8):
+                        if ((position[1] + x) >= 0) and ((position[1] + x) < 8):
+                            if board_state[(position[0] + y)][(position[1] + x)] <= 0:
+                                # Checks if the square is attacked by enemy pieces
+                                if not in_check(board_state, self, position, [(position[0] + y), (position[1] + x)]):
+                                    king_moves.append([(position[0] + y), (position[1] + x)])
+
+            # Checks if the king can castle
+            if not(self.white_king_moved):
+                # Checks long castle
+                if not(self.rook_a1_moved):
+                    if (board_state[position[0]][position[1] - 1] == 0) and (board_state[position[0]][position[1] - 2] == 0) and (board_state[position[0]][position[1] - 3] == 0):
+                        king_moves.append([position[0], (position[1] - 2)])
+                # Checks short castle
+                if not(self.rook_h1_moved):
+                    if (board_state[position[0]][position[1] + 1] == 0) and (board_state[position[0]][position[1] + 2] == 0):
+                        king_moves.append([position[0], (position[1] + 2)])
         return king_moves
 
 
