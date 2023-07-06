@@ -12,7 +12,7 @@ class board:
                         [0,  0,   0,     0,   0,  0,     0,  0],
                         [0,  0,   0,     0,   0,  0,     0,  0],
                         [0,  0,   0,     0,   0,  0,     0,  0],
-                        [0,  0,   0,     0,   0,  0,     0,  0],
+                        [0,  0,   0,     0,   9,  0,     0,  0],
                         [1,  1,   1,     1,   1,  1,     1,  1],
                         [5,  3,   3.25,  9,  10,  3.25,  3,  5]])
 
@@ -477,17 +477,46 @@ def piece_caller(value):
     
 
 def in_check(board_state, piece, start_pos, end_pos):
+    # Makes the tested move in order to check for checks
     board_state[start_pos[0]][start_pos[1]] = 0
     board_state[end_pos[0]][end_pos[1]] = piece.value
 
+    # Checks for checks for the black pieces
     if piece.side == -1:
+        # Iterates through each row and square
         for row in range(0, 8):
             for square in range(0, 8):
+                # Checks if an enemy piece is in the position/square
                 if board_state[row][square] > 0:
+                    # If yes, it calls that piece and checks it's legal moves
                     enemy_piece = piece_caller(board_state[row][square])
                     enemy_moves = enemy_piece.legal_moves([row, square], board_state)
+                    # If any of it's moves hits the king, if it were to move into that square
+                    #  then True is returned
                     if end_pos in enemy_moves:
+                        board_state[start_pos[0]][start_pos[1]] = piece.value
+                        board_state[end_pos[0]][end_pos[1]] = 0
                         return True
+    # Same as before, but for white
+    else:
+        # Iterates through each row and square
+        for row in range(0, 8):
+            for square in range(0, 8):
+                # Checks if an enemy piece is in the position/square
+                if board_state[row][square] > 0:
+                    # If yes, it calls that piece and checks it's legal moves
+                    enemy_piece = piece_caller(board_state[row][square])
+                    enemy_moves = enemy_piece.legal_moves([row, square], board_state)
+                    # If any of it's moves hits the king, if it were to move into that square
+                    #  then True is returned
+                    if end_pos in enemy_moves:
+                        board_state[start_pos[0]][start_pos[1]] = piece.value
+                        board_state[end_pos[0]][end_pos[1]] = 0
+                        return True
+    # If none of the enemy pieces hit's the king were it to move into that square
+    # Then False is returned
+    board_state[start_pos[0]][start_pos[1]] = piece.value
+    board_state[end_pos[0]][end_pos[1]] = 0
     return False
 
 
