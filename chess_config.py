@@ -1,7 +1,8 @@
+
 def main():
-    current_board = chess().board
+    current_game = chess()
     piece = king(-1)
-    moves = piece.legal_moves(([0, 4]), current_board)
+    moves = piece.legal_moves(([0, 4]), current_game)
     print(moves)
 
 
@@ -33,6 +34,8 @@ class chess:
 
         self.last_move_en_passant = False
 
+        self.current_player_turn = 1
+
 
 class pawn:
     def __init__(self, color):
@@ -40,9 +43,10 @@ class pawn:
         self.side = color
         self.value = (1 * color)
 
-    def legal_moves(self, position, board_state):
+    def legal_moves(self, position, game):
         # Stores legal moves for this piece in the following list
         pawn_moves = []
+        board_state = game.board
         # Checks moves if the piece color is black
         if self.side == -1:
             # Checks if the piece can move forward
@@ -87,9 +91,10 @@ class bishop:
         self.side = color
         self.value = (3.25 * color)
 
-    def legal_moves(self, position, board_state):
+    def legal_moves(self, position, game):
         # Stores the legal moves for the bishop or the defended squares when the defends parameter is true
         bishop_moves = []
+        board_state = game.board
 
         # Checks moves for when the piece is white
         if self.side == -1:
@@ -263,9 +268,10 @@ class knight:
         # "color" is -1 for black and 1 for white
         self.side = color
         self.value = (3 * color)
-    def legal_moves(self, position, board_state):
+    def legal_moves(self, position, game):
         # Stores legal moves for the knight or defended squares when the defends parameter is True
         knight_moves = []
+        board_state = game.board
 
         # Checks legal moves for a black knight 
         if self.side == -1:
@@ -328,9 +334,10 @@ class rook:
         # "color" is -1 for black and 1 for white
         self.side = color
         self.value = (5 * color)
-    def legal_moves(self, position, board_state):
+    def legal_moves(self, position, game):
         # Stores legal moves for the rook or defended squares when defends is True
         rook_moves = []
+        board_state = game.board
 
         if self.side == -1:
             # Checks moves forward(1) and backwards(-1), left(-1) and right(1)
@@ -424,7 +431,7 @@ class queen:
         # "color" is -1 for black and 1 for white
         self.side = color
         self.value = (9 * color)
-    def legal_moves(self, position, board_state):
+    def legal_moves(self, position, game):
         queen_moves = []
 
         # Since the queen moves like a bishop and rook combined, I just call their classes and combine the legal moves for both
@@ -432,8 +439,8 @@ class queen:
         rook1 = rook(self.side)
 
         # Stores the legal moves of the queen as if it were a bishop and rook
-        bishop_moves = bishop1.legal_moves(position, board_state)
-        rook_moves = rook1.legal_moves(position, board_state)
+        bishop_moves = bishop1.legal_moves(position, game)
+        rook_moves = rook1.legal_moves(position, game)
         
         # Combines the moves into a list of legal moves for the queen
         for moves in [bishop_moves, rook_moves]:
@@ -450,8 +457,9 @@ class king:
         self.value = (10 * color)
     def side(self):
         return self.side
-    def legal_moves(self, position, board_state):
+    def legal_moves(self, position, game):
         king_moves = []
+        board_state = game.board
         
         if self.side == -1:
             # Loops through all the squares around the king
@@ -461,17 +469,17 @@ class king:
                         if ((position[1] + x) >= 0) and ((position[1] + x) < 8):
                             if board_state[(position[0] + y)][(position[1] + x)] >= 0:
                                 # Checks if the square is attacked by enemy pieces
-                                if not in_check(board_state, self, position, [(position[0] + y), (position[1] + x)]):
+                                if not in_check(game, self, position, [(position[0] + y), (position[1] + x)]):
                                     king_moves.append([(position[0] + y), (position[1] + x)])
 
             # Checks if the king can castle
-            if not(self.black_king_moved):
+            if not(game.black_king_moved):
                 # Checks long castle
-                if not(self.rook_a8_moved):
+                if not(game.rook_a8_moved):
                     if (board_state[position[0]][position[1] - 1] == 0) and (board_state[position[0]][position[1] - 2] == 0) and (board_state[position[0]][position[1] - 3] == 0):
                         king_moves.append([position[0], (position[1] - 2)])
                 # Checks short castle
-                if not(self.rook_h8_moved):
+                if not(game.rook_h8_moved):
                     if (board_state[position[0]][position[1] + 1] == 0) and (board_state[position[0]][position[1] + 2] == 0):
                         king_moves.append([position[0], (position[1] + 2)])
         else:
@@ -486,13 +494,13 @@ class king:
                                     king_moves.append([(position[0] + y), (position[1] + x)])
 
             # Checks if the king can castle
-            if not(self.white_king_moved):
+            if not(game.white_king_moved):
                 # Checks long castle
-                if not(self.rook_a1_moved):
+                if not(game.rook_a1_moved):
                     if (board_state[position[0]][position[1] - 1] == 0) and (board_state[position[0]][position[1] - 2] == 0) and (board_state[position[0]][position[1] - 3] == 0):
                         king_moves.append([position[0], (position[1] - 2)])
                 # Checks short castle
-                if not(self.rook_h1_moved):
+                if not(game.rook_h1_moved):
                     if (board_state[position[0]][position[1] + 1] == 0) and (board_state[position[0]][position[1] + 2] == 0):
                         king_moves.append([position[0], (position[1] + 2)])
         return king_moves
@@ -525,13 +533,20 @@ def piece_caller(value):
         return king(-1)
     
 
-def in_check(board_state, piece, start_pos, end_pos):
+def in_check(game, piece, start_pos, end_pos):
     # Makes the tested move in order to check for checks
+    king_position = []
+    board_state = game.board
     board_state[start_pos[0]][start_pos[1]] = 0
     board_state[end_pos[0]][end_pos[1]] = piece.value
 
     # Checks for checks for the black pieces
     if piece.side == -1:
+        # Finds the king
+        for row in range(0, 8):
+            for square in range(0, 8):
+                if board_state[row][square] == -10:
+                    king_position = [row, square]
         # Iterates through each row and square
         for row in range(0, 8):
             for square in range(0, 8):
@@ -539,10 +554,10 @@ def in_check(board_state, piece, start_pos, end_pos):
                 if board_state[row][square] > 0:
                     # If yes, it calls that piece and checks it's legal moves
                     enemy_piece = piece_caller(board_state[row][square])
-                    enemy_moves = enemy_piece.legal_moves([row, square], board_state)
+                    enemy_moves = enemy_piece.legal_moves([row, square], game)
                     # If any of it's moves hits the king, if it were to move into that square
                     #  then True is returned
-                    if end_pos in enemy_moves:
+                    if king_position in enemy_moves:
                         board_state[start_pos[0]][start_pos[1]] = piece.value
                         board_state[end_pos[0]][end_pos[1]] = 0
                         return True
@@ -555,7 +570,7 @@ def in_check(board_state, piece, start_pos, end_pos):
                 if board_state[row][square] > 0:
                     # If yes, it calls that piece and checks it's legal moves
                     enemy_piece = piece_caller(board_state[row][square])
-                    enemy_moves = enemy_piece.legal_moves([row, square], board_state)
+                    enemy_moves = enemy_piece.legal_moves([row, square], game)
                     # If any of it's moves hits the king, if it were to move into that square
                     #  then True is returned
                     if end_pos in enemy_moves:
@@ -567,6 +582,50 @@ def in_check(board_state, piece, start_pos, end_pos):
     board_state[start_pos[0]][start_pos[1]] = piece.value
     board_state[end_pos[0]][end_pos[1]] = 0
     return False
+
+
+
+def make_move(game, start_pos, end_pos):
+    piece = piece_caller(game.board[start_pos[0]][start_pos[1]])
+    if end_pos in piece.legal_moves(start_pos, game.board):
+        # Checks that the piece is the black king
+        if piece.value == -10:
+            # Updates the king_moved variable to disable future castling
+            game.black_king_moved = True
+            # Checks if the player is currently castling short
+            if (end_pos[1] - 2) == start_pos[1]:
+                # Updates the rook position and variable
+                game.rook_h8_moved = True
+                game.board[0][7] = 0
+                game.board[0][5] = -5
+            # Checks if the player is currently castling long
+            elif (end_pos[1] + 2) == start_pos[1]:
+                # Updates the rook position and variable
+                game.rook_a8_moved = True
+                game.board[0][0] = 0
+                game.board[0][3] = -5
+        elif piece.value == 10:
+            # Updates the king_moved variable to disable future castling
+            game.white_king_moved = True
+            # Checks if the player is currently castling short
+            if (end_pos[1] - 2) == start_pos[1]:
+                # Updates the rook position and variable
+                game.rook_h1_moved = True
+                game.board[7][7] = 0
+                game.board[7][5] = 5
+            # Checks if the player is currently castling long
+            elif (end_pos[1] + 2) == start_pos[1]:
+                # Updates the rook position and variable
+                game.rook_a1_moved = True
+                game.board[7][0] = 0
+                game.board[7][3] = 5
+
+        if in_check(game, piece, start_pos, end_pos):
+            return False
+        else:
+            game.board[start_pos[0]][start_pos[1]] = 0
+            game.board[end_pos[0]][end_pos[1]] = piece.value
+            return True
 
 
 main()
