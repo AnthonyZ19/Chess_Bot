@@ -1,20 +1,37 @@
 def main():
-    current_board = board().board
+    current_board = chess().board
     piece = king(-1)
     moves = piece.legal_moves(([0, 4]), current_board)
     print(moves)
 
 
-class board:
+# Stores chess game info
+class chess:
     def __init__(self):
-        self.board = ([ [-5,-3, -3.25,  -9, -10, -3.25, -3, -5],
-                        [-1,-1,  -1,    -1,  -1, -1,    -1, -1],
-                        [0,  0,   0,     0,   0,  0,     0,  0],
-                        [0,  0,   0,     0,   0,  0,     0,  0],
-                        [0,  0,   0,     0,   0,  0,     0,  0],
-                        [0,  0,   0,     0,   9,  0,     0,  0],
-                        [1,  1,   1,     1,   1,  1,     1,  1],
-                        [5,  3,   3.25,  9,  10,  3.25,  3,  5]])
+        self.board = ([ [-5,-3, -3.25, -9, -10, -3.25, -3, -5],
+                        [-1,-1, -1,    -1,  -1, -1,    -1, -1],
+                        [ 0, 0,  0,     0,   0,  0,     0,  0],
+                        [ 0, 0,  0,     0,   0,  0,     0,  0],
+                        [ 0, 0,  0,     0,   0,  0,     0,  0],
+                        [ 0, 0,  0,     0,   0,  0,     0,  0],
+                        [ 1, 1,  1,     1,   1,  1,     1,  1],
+                        [ 5, 3,  3.25,  9,  10,  3.25,  3,  5]])
+        
+        self.white_king_moved = False
+
+        self.rook_a1_moved = False
+
+        self.rook_h1_moved = False
+
+        self.black_king_moved = False
+
+        self.rook_a8_moved = False
+
+        self.rook_h8_moved = False
+
+        self.last_move_end_pos = []
+
+        self.last_move_en_passant = False
 
 
 class pawn:
