@@ -9,6 +9,8 @@ def main():
 # Stores chess game info
 class chess:
     def __init__(self):
+        self.moves = []
+        
         self.board = ([ [-5,-3, -3.25, -9, -10, -3.25, -3, -5],
                         [-1,-1, -1,    -1,  -1, -1,    -1, -1],
                         [ 0, 0,  0,     0,   0,  0,     0,  0],
@@ -29,8 +31,6 @@ class chess:
         self.rook_a8_moved = False
 
         self.rook_h8_moved = False
-
-        self.last_move_end_pos = []
 
         self.last_move_en_passant = False
 
@@ -584,45 +584,105 @@ def in_check(game, piece, start_pos, end_pos):
     return False
 
 
+def letter_to_piece(letter, turn):
+    if letter == 'K':
+        return piece_caller(10 * turn)
+    
+    elif letter == 'Q':
+        return piece_caller(9 * turn)
+    
+    elif letter == 'R':
+        return piece_caller(5 * turn)
+    
+    elif letter == 'B':
+        return piece_caller(3.25 * turn)
+    
+    elif letter == 'N':
+        return piece_caller(3 * turn)
+    
+    elif letter == '':
+        return piece_caller(turn)
+    
+
+def letter_to_row(letter):
+    row = 0
+    for Letter in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']:
+        if letter == Letter:
+            return row
+        else:
+            row += 1
+
+
+def chess_notation_translator(notation, turn):
+    piece = None
+    position = []
+
+    if len(notation) == 2:
+        piece = piece_caller(turn)
+        position.append(letter_to_row(notation[0]))
+        position.append(int(notation[1]))
+    elif len(notation) == 3:
+        piece = piece_caller(turn)
+
 
 def make_move(game, start_pos, end_pos):
+    if game.current_player_turn == -1:
+        if game.board[start_pos[0]][start_pos[1]] > 0:
+            return False
+    elif game.current_player_turn == 1:
+        if game.board[start_pos[0]][start_pos[1]] < 0:
+            return False
+        
     piece = piece_caller(game.board[start_pos[0]][start_pos[1]])
     if end_pos in piece.legal_moves(start_pos, game.board):
-        # Checks that the piece is the black king
-        if piece.value == -10:
-            # Updates the king_moved variable to disable future castling
-            game.black_king_moved = True
-            # Checks if the player is currently castling short
-            if (end_pos[1] - 2) == start_pos[1]:
-                # Updates the rook position and variable
-                game.rook_h8_moved = True
-                game.board[0][7] = 0
-                game.board[0][5] = -5
-            # Checks if the player is currently castling long
-            elif (end_pos[1] + 2) == start_pos[1]:
-                # Updates the rook position and variable
-                game.rook_a8_moved = True
-                game.board[0][0] = 0
-                game.board[0][3] = -5
-        elif piece.value == 10:
-            # Updates the king_moved variable to disable future castling
-            game.white_king_moved = True
-            # Checks if the player is currently castling short
-            if (end_pos[1] - 2) == start_pos[1]:
-                # Updates the rook position and variable
-                game.rook_h1_moved = True
-                game.board[7][7] = 0
-                game.board[7][5] = 5
-            # Checks if the player is currently castling long
-            elif (end_pos[1] + 2) == start_pos[1]:
-                # Updates the rook position and variable
-                game.rook_a1_moved = True
-                game.board[7][0] = 0
-                game.board[7][3] = 5
-
         if in_check(game, piece, start_pos, end_pos):
             return False
         else:
+            # Checks that the piece is the black king
+            if piece.value == -10:
+                # Updates the king_moved variable to disable future castling
+                game.black_king_moved = True
+                # Checks if the player is currently castling short
+                if (end_pos[1] - 2) == start_pos[1]:
+                    # Updates the rook position and variable
+                    game.rook_h8_moved = True
+                    game.board[0][7] = 0
+                    game.board[0][5] = -5
+                # Checks if the player is currently castling long
+                elif (end_pos[1] + 2) == start_pos[1]:
+                    # Updates the rook position and variable
+                    game.rook_a8_moved = True
+                    game.board[0][0] = 0
+                    game.board[0][3] = -5
+            elif piece.value == 10:
+                # Updates the king_moved variable to disable future castling
+                game.white_king_moved = True
+                # Checks if the player is currently castling short
+                if (end_pos[1] - 2) == start_pos[1]:
+                    # Updates the rook position and variable
+                    game.rook_h1_moved = True
+                    game.board[7][7] = 0
+                    game.board[7][5] = 5
+                # Checks if the player is currently castling long
+                elif (end_pos[1] + 2) == start_pos[1]:
+                    # Updates the rook position and variable
+                    game.rook_a1_moved = True
+                    game.board[7][0] = 0
+                    game.board[7][3] = 5
+            elif piece.value == -1:
+                # Checks if the pawn moved 2 squares
+                if (end_pos[0] + 2) == start_pos[0]:
+                    game.last_move_en_passant = True
+                else:
+                    game.last_move_en_passant = False
+            elif piece.value == 1:
+                # Checks if the pawn moved 2 squares
+                if (end_pos[0] - 2) == start_pos[0]:
+                    game.last_move_en_passant = True
+                else:
+                    game.last_move_en_passant = False
+
+            game.current_player_turn *= -1
             game.board[start_pos[0]][start_pos[1]] = 0
             game.board[end_pos[0]][end_pos[1]] = piece.value
             return True
