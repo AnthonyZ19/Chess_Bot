@@ -1,13 +1,28 @@
-
 def main():
     current_game = chess()
-    for row in current_game.board:
-        print(row)
-    notation = input("Make Your Move: ")
-    move = chess_notation_translator(notation, current_game)
-    make_move(current_game, move[0], move[1])
-    for row in current_game.board:
-        print(row)
+    counter = 0
+
+    print_board(current_game.board)
+
+    while counter < 8:
+        notation = input("Make Your Move " + str(current_game.current_player_turn) + ": ")
+        move = chess_notation_translator(notation, current_game)
+        if not move:
+            print(current_game.move_feedback)
+            continue
+
+        make_move(current_game, move[0], move[1])
+        if current_game.move_feedback == "Success":
+            print_board(current_game.board)
+            counter += 1
+        else:
+            print(current_game.move_feedback)
+"""
+            if not (make_move(current_game, move[0], move[1])):
+                print("Invalid Move")
+                continue
+"""
+#        print(current_game.moves)
 
 
 
@@ -41,6 +56,8 @@ class chess:
 
         self.current_player_turn = 1
 
+        self.move_feedback = ""
+
 
 class pawn:
     def __init__(self, color):
@@ -70,6 +87,15 @@ class pawn:
                 if board_state[(position[0] + 1)][position[1] - 1] > 0:
                     pawn_moves.append([(position[0] + 1), (position[1] - 1)])
 
+            if game.moves:
+                if game.last_move_en_passant:
+                    passant_pawn_pos = (game.moves[len(game.moves) - 1])["White"][2]
+                    if passant_pawn_pos[0] == position[0]:
+                        if passant_pawn_pos[1] == (position[1] + 1):
+                            pawn_moves.append([(position[0] + 1), (position[1] + 1)])
+                        elif passant_pawn_pos[1] == (position[1] - 1):
+                            pawn_moves.append([(position[0] + 1), (position[1] - 1)])
+
         # Checks moves if the piece is white
         else:
             # Checks if it can move forward
@@ -81,12 +107,22 @@ class pawn:
 
             # Checks if the piece can take another
             if (position[0] > 0) and (position[1] < 7):
-                if board_state[(position[0] - 1)][position[1] + 1] > 0:
+                if board_state[(position[0] - 1)][position[1] + 1] < 0:
                     pawn_moves.append([(position[0] - 1), (position[1] + 1)])
 
             if (position[0] > 0) and (position[1] > 0):
-                if board_state[(position[0] - 1)][position[1] - 1] > 0:
+                if board_state[(position[0] - 1)][position[1] - 1] < 0:
                     pawn_moves.append([(position[0] - 1), (position[1] - 1)])
+
+            if len(game.moves) > 1:
+                if game.last_move_en_passant:
+                    passant_pawn_pos = (game.moves[len(game.moves) - 1])["Black"][2]
+                    if passant_pawn_pos[0] == position[0]:
+                        if passant_pawn_pos[1] == (position[1] + 1):
+                            pawn_moves.append([(position[0] - 1), (position[1] + 1)])
+                        elif passant_pawn_pos[1] == (position[1] - 1):
+                            pawn_moves.append([(position[0] - 1), (position[1] - 1)])
+
         return pawn_moves
 
 
@@ -598,20 +634,24 @@ def in_check(game, piece, start_pos, end_pos):
                         return True
     # Same as before, but for white
     else:
+        for row in range(0, 8):
+            for square in range(0, 8):
+                if board_state[row][square] == 10:
+                    king_position = [row, square]
         # Iterates through each row and square
         for row in range(0, 8):
             for square in range(0, 8):
                 # Checks if an enemy piece is in the position/square
-                if board_state[row][square] > 0:
+                if board_state[row][square] <  0:
                     # If yes, it calls that piece and checks it's legal moves
                     enemy_piece = piece_caller(board_state[row][square])
-                    if abs(enemy_piece.value) == 10:
+                    if enemy_piece.value == -10:
                         enemy_moves = enemy_piece.legal_moves([row, square], game, True)
                     else:
                         enemy_moves = enemy_piece.legal_moves([row, square], game)
                     # If any of it's moves hits the king, if it were to move into that square
                     #  then True is returned
-                    if end_pos in enemy_moves:
+                    if king_position in enemy_moves:
                         board_state[start_pos[0]][start_pos[1]] = piece.value
                         board_state[end_pos[0]][end_pos[1]] = 0
                         return True
@@ -640,6 +680,8 @@ def letter_to_piece(letter, turn):
     
     elif letter == '':
         return piece_caller(turn)
+    else:
+        return False
     
 
 def letter_to_index(letter):
@@ -649,6 +691,8 @@ def letter_to_index(letter):
             return index
         else:
             index += 1
+    
+    return False
 
 
 def chess_notation_translator(notation, game):
@@ -665,11 +709,13 @@ def chess_notation_translator(notation, game):
         if notation[0].isalpha() and notation[1].isdigit():
             if (notation[0] == notation[0].lower()) and (int(notation[1]) >= 0) and (int(notation[1]) <= 7):
                 piece = piece_caller(turn)
-                end_pos_row = int(notation[1])
+                end_pos_row = (8 - int(notation[1]))
                 end_pos_col = letter_to_index(notation[0])
             else:
+                game.move_feedback = "Invalid Notation"
                 return False
         else:
+            game.move_feedback = "Invalid Notation"
             return False
 
     elif len(notation) == 3:
@@ -688,15 +734,19 @@ def chess_notation_translator(notation, game):
                     if notation[1] == notation[1].lower():
                         if (int(notation[2]) >= 0) and (int(notation[2]) <= 7):
                             piece = letter_to_piece(notation[0], turn)
-                            end_pos_row = int(notation[2])
+                            end_pos_row = (8 - int(notation[2]))
                             end_pos_col = letter_to_index(notation[1])
                         else:
+                            game.move_feedback = "Invalid Notation"
                             return False
                     else:
+                        game.move_feedback = "Invalid Notation"
                         return False
                 else:
+                    game.move_feedback = "Invalid Notation"
                     return False
             else:
+                game.move_feedback = "Invalid Notation"
                 return False
     elif len(notation) == 4:
         if notation[0].isalpha():
@@ -704,78 +754,108 @@ def chess_notation_translator(notation, game):
                 if notation[2].isalpha() and (notation[2] == notation[2].lower()) and notation[3].isdigit() and (int(notation[3]) >= 0) and (int(notation[3]) <= 7):
                     if notation[0] == notation[0].lower():
                         piece = piece_caller(turn)
-                        end_pos_row = int(notation[3])
+                        end_pos_row = (8 - int(notation[3]))
                         end_pos_col = letter_to_index(notation[2])
                         start_pos_col = letter_to_index(notation[0])
                     elif notation[0] == notation[0].upper():
 
                         piece = letter_to_piece(notation[0], turn)
-                        end_pos_row = int(notation[3])
+                        end_pos_row = (8 - int(notation[3]))
                         end_pos_col = letter_to_index(notation[2])
                     else:
+                        game.move_feedback = "Invalid Notation"
                         return False
                 else:
+                    game.move_feedback = "Invalid Notation"
                     return False
             elif is_check_notation(notation) or is_checkmate_notation(notation):
                 if notation[0].isalpha() and notation[1].isalpha() and notation[2].isdigit():
                     if (notation[0] == notation[0].upper()) and (notation[1] == notation[1].lower()) and ((int(notation[2]) >= 0) and (int(notation[2]) <= 7)):
                         piece = letter_to_piece(notation[0], turn)
-                        end_pos_row = int(notation[2])
+                        end_pos_row = (8 - int(notation[2]))
                         end_pos_col = letter_to_index(notation[1])
                     else:
+                        game.move_feedback = "Invalid Notation"
                         return False
                 else:
+                    game.move_feedback = "Invalid Notation"
                     return False
             elif notation[0].isalpha() and notation[1].isalpha() and notation[2].isalpha() and notation[3].isdigit():
                 if (notation[0] == notation[0].upper()) and (notation[1] == notation[1].lower()) and (notation[2] == notation[2].lower()) and  ((int(notation[3]) >= 0) and (int(notation[3]) <= 7)):
                     piece = letter_to_piece(notation[0], turn)
-                    end_pos_row = int(notation[3])
+                    end_pos_row = (8 - int(notation[3]))
                     end_pos_col = letter_to_index(notation[2])
                     start_pos_col = letter_to_index(notation[1])
                 else:
+                    game.move_feedback = "Invalid Notation"
                     return False
             elif notation[0].isalpha() and notation[1].isdigit() and notation[2].isalpha() and notation[3].isdigit():
                 if (notation[0] == notation[0].upper()) and ((int(notation[1]) >= 0) and (int(notation[1]) <= 7)) and (notation[2] == notation[2].lower()) and  ((int(notation[3]) >= 0) and (int(notation[3]) <= 7)):
                     piece = letter_to_piece(notation[0], turn)
-                    end_pos_row = int(notation[3])
+                    end_pos_row = (8 - int(notation[3]))
                     end_pos_col = letter_to_index(notation[2])
-                    start_pos_col = int(notation[1])
+                    start_pos_col = (8 - int(notation[1]))
                 else:
+                    game.move_feedback = "Invalid Notation"
                     return False
             else:
+                game.move_feedback = "Invalid Notation"
                 return False
     else:
+        game.move_feedback = "Invalid Notation"
         return False
     
     for row in range(0, 8):
         for col in range(0, 8):
             if game.board[row][col] == piece.value:
                 moves = piece.legal_moves([row, col], game)
-                if start_pos_col != None:
+                if not (start_pos_col == None):
                     if ([end_pos_row, end_pos_col] in moves) and col == start_pos_col:
                         start_pos_row = row
                         start_pos_col = col
-                elif start_pos_row != None:
+                        break
+                elif not (start_pos_row == None):
                     if ([end_pos_row, end_pos_col] in moves) and row == start_pos_row:
                         start_pos_col = col
                         start_pos_row = row
+                        break
                 elif [end_pos_row, end_pos_col] in moves:
                     start_pos_row = row
                     start_pos_col = col
+                    break
+
+    game.move_feedback = "Valid Notation"
     return [[start_pos_row, start_pos_col], [end_pos_row, end_pos_col]]
 
 
 def make_move(game, start_pos, end_pos):
-    if game.current_player_turn == -1:
-        if game.board[start_pos[0]][start_pos[1]] > 0:
-            return False
-    elif game.current_player_turn == 1:
-        if game.board[start_pos[0]][start_pos[1]] < 0:
-            return False
+    game.move_feedback = "Move Error"
+    en_passant = False
+    en_passant_capture = False
+
+    if not (start_pos):
+        game.move_feedback = "Error: empty starting position"
+        return False
+    if not (end_pos):
+        game.move_feedback = "Error: empty ending position"
+        return False
+    if (not (start_pos[0])) and (start_pos[0] != 0):
+        game.move_feedback = "Error: empty starting position"
+        return False
+    if not (start_pos[1]) and (start_pos[1] != 0):
+        game.move_feedback = "Error: empty starting position"
+        return False
+    if not (end_pos[0]) and (end_pos[0] != 0):
+        game.move_feedback = "Error: empty ending position"
+        return False
+    if not (end_pos[1] and (end_pos[1] != 0)):
+        game.move_feedback = "Error: empty ending position"
+        return False
         
     piece = piece_caller(game.board[start_pos[0]][start_pos[1]])
     if end_pos in piece.legal_moves(start_pos, game):
         if in_check(game, piece, start_pos, end_pos):
+            game.move_feedback = "This move puts you in check"
             return False
         else:
             # Checks that the piece is the black king
@@ -811,21 +891,101 @@ def make_move(game, start_pos, end_pos):
                     game.board[7][3] = 5
             elif piece.value == -1:
                 # Checks if the pawn moved 2 squares
-                if (end_pos[0] + 2) == start_pos[0]:
-                    game.last_move_en_passant = True
-                else:
-                    game.last_move_en_passant = False
+                if (end_pos[0] - 2) == start_pos[0]:
+                    en_passant = True
             elif piece.value == 1:
                 # Checks if the pawn moved 2 squares
-                if (end_pos[0] - 2) == start_pos[0]:
-                    game.last_move_en_passant = True
-                else:
-                    game.last_move_en_passant = False
+                if (end_pos[0] + 2) == start_pos[0]:
+                    en_passant = True
 
-            game.current_player_turn *= -1
+            if game.moves:
+                if game.last_move_en_passant:
+                    if piece.value == -1:
+                        passant_pawn_pos = (game.moves[len(game.moves) - 1])["White"][2]
+                        if passant_pawn_pos[0] == start_pos[0]:
+                            if passant_pawn_pos[1] == (start_pos[1] + 1):
+                                en_passant_capture = True
+                            elif passant_pawn_pos[1] == (start_pos[1] - 1):
+                                en_passant_capture = True
+
+            if en_passant_capture:
+                if game.current_player_turn == -1:
+                    game.board[end_pos[0] - 1][end_pos[1]] = 0
+                else:
+                    game.board[end_pos[0] + 1][end_pos[1]] = 0
+            
             game.board[start_pos[0]][start_pos[1]] = 0
             game.board[end_pos[0]][end_pos[1]] = piece.value
+
+            if game.current_player_turn == 1:
+                (game.moves).append({"White" : [piece.value, start_pos, end_pos]})
+                if (piece.value == 5) and (start_pos == [7, 0]):
+                    game.rook_a1_moved == True
+                elif (piece.value == 5) and (start_pos == [7, 7]):
+                    game.rook_h1_moved == True
+            else:
+                ((game.moves)[len(game.moves) - 1]).update({"Black": [piece.value, start_pos, end_pos]})
+                if (piece.value == -5) and (start_pos == [0, 0]):
+                    game.rook_a8_moved == True
+                elif (piece.value == -5) and (start_pos == [0, 7]):
+                    game.rook_h8_moved == True
+
+            game.current_player_turn *= -1
+            game.move_feedback = "Success"
+            
+            if en_passant:
+                game.last_move_en_passant = True
+            else:
+                game.last_move_en_passant = False
             return True
+
+
+def num_to_letter(value):
+
+    if value == 0:
+        return "0"
+    elif value == 1:
+        return "P"
+    elif value == -1:
+        return "p"
+    elif value == 3:
+        return "N"
+    elif value == -3:
+        return "n"
+    elif value == 3.25:
+        return "B"
+    elif value == -3.25:
+        return "b"
+    elif value == 5:
+        return "R"
+    elif value == -5:
+        return "r"
+    elif value == 9:
+        return "Q"
+    elif value == -9:
+        return "q"
+    elif value == 10:
+        return "K"
+    elif value == -10:
+        return "k"
+    
+
+def print_board(board):
+    modified_row = []
+
+    for row in board:
+        #print(row)
+        for square in row:
+            modified_row.append(num_to_letter(square))
+        print(modified_row)
+        modified_row = []
+
+
+def find_king(value, board):
+    for row in range(0, 8):
+        for col in range(0, 8):
+            if board[row][col] == value:
+                return [row, col]
 
 
 main()
