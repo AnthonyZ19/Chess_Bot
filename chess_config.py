@@ -1,10 +1,9 @@
 def main():
     current_game = chess()
-    counter = 0
 
     print_board(current_game.board)
 
-    while counter < 30:
+    while True:
         if is_checkmate(current_game):
             if current_game.current_player_turn == 1:
                 print("Checkmate, Black wins")
@@ -22,11 +21,9 @@ def main():
         make_move(current_game, move[0], move[1])
         if current_game.move_feedback == "Success":
             print_board(current_game.board)
-            counter += 1
         elif current_game.move_feedback == "Check":
             print_board(current_game.board)
             print(current_game.move_feedback)
-            counter += 1
         else:
             print(current_game.move_feedback)
 
