@@ -5,6 +5,14 @@ def main():
     print_board(current_game.board)
 
     while counter < 30:
+        if is_checkmate(current_game):
+            if current_game.current_player_turn == 1:
+                print("Checkmate, Black wins")
+                break
+            else:
+                print("Checkmate, White wins")
+                break
+
         notation = input("Make Your Move " + str(current_game.current_player_turn) + ": ")
         move = chess_notation_translator(notation, current_game)
         if not move:
@@ -616,20 +624,20 @@ def in_check(game, piece, start_pos, end_pos):
     if game.current_player_turn == -1:
         # Finds the king
         for row in range(0, 8):
-            for square in range(0, 8):
-                if board_state[row][square] == -10:
-                    king_position = [row, square]
+            for col in range(0, 8):
+                if board_state[row][col] == -10:
+                    king_position = [row, col]
         # Iterates through each row and square
         for row in range(0, 8):
-            for square in range(0, 8):
+            for col in range(0, 8):
                 # Checks if an enemy piece is in the position/square
-                if board_state[row][square] > 0:
+                if board_state[row][col] > 0:
                     # If yes, it calls that piece and checks it's legal moves
-                    enemy_piece = piece_caller(board_state[row][square])
+                    enemy_piece = piece_caller(board_state[row][col])
                     if abs(enemy_piece.value) == 10:
-                        enemy_moves = enemy_piece.legal_moves([row, square], game, True)
+                        enemy_moves = enemy_piece.legal_moves([row, col], game, True)
                     else:
-                        enemy_moves = enemy_piece.legal_moves([row, square], game)
+                        enemy_moves = enemy_piece.legal_moves([row, col], game)
                     # If any of it's moves hits the king, if it were to move into that square
                     #  then True is returned
                     if king_position in enemy_moves:
@@ -639,20 +647,20 @@ def in_check(game, piece, start_pos, end_pos):
     # Same as before, but for white
     else:
         for row in range(0, 8):
-            for square in range(0, 8):
-                if board_state[row][square] == 10:
-                    king_position = [row, square]
+            for col in range(0, 8):
+                if board_state[row][col] == 10:
+                    king_position = [row, col]
         # Iterates through each row and square
         for row in range(0, 8):
-            for square in range(0, 8):
+            for col in range(0, 8):
                 # Checks if an enemy piece is in the position/square
-                if board_state[row][square] <  0:
+                if board_state[row][col] <  0:
                     # If yes, it calls that piece and checks it's legal moves
-                    enemy_piece = piece_caller(board_state[row][square])
+                    enemy_piece = piece_caller(board_state[row][col])
                     if enemy_piece.value == -10:
-                        enemy_moves = enemy_piece.legal_moves([row, square], game, True)
+                        enemy_moves = enemy_piece.legal_moves([row, col], game, True)
                     else:
-                        enemy_moves = enemy_piece.legal_moves([row, square], game)
+                        enemy_moves = enemy_piece.legal_moves([row, col], game)
                     # If any of it's moves hits the king, if it were to move into that square
                     #  then True is returned
                     if king_position in enemy_moves:
@@ -1015,8 +1023,8 @@ def print_board(board):
 
     for row in board:
         #print(row)
-        for square in row:
-            modified_row.append(num_to_letter(square))
+        for col in row:
+            modified_row.append(num_to_letter(col))
         print(modified_row)
         modified_row = []
 
@@ -1026,6 +1034,34 @@ def find_king(value, board):
         for col in range(0, 8):
             if board[row][col] == value:
                 return [row, col]
+
+
+def is_checkmate(game):
+    legal_moves = []
+    # Checks if 
+    if game.current_player_turn == -1:
+        for row in range(0, 8):
+            for col in range(0 ,8):
+                if game.board[row][col] < 0:
+                    piece = piece_caller(game.board[row][col])
+                    moves = piece.legal_moves([row, col], game)
+                    for move in moves:
+                        if not (in_check(game, piece, [row, col], move)):
+                            legal_moves.append(moves)
+    else:
+        for row in range(0, 8):
+            for col in range(0 ,8):
+                if game.board[row][col] > 0:
+                    piece = piece_caller(game.board[row][col])
+                    moves = piece.legal_moves([row, col], game)
+                    for move in moves:
+                        if not (in_check(game, piece, [row, col], move)):
+                            legal_moves.append(moves)
+
+    if legal_moves:
+        return False
+    else:
+        return True
 
 
 main()
