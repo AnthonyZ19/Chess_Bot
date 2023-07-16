@@ -4,13 +4,8 @@ def main():
     print_board(current_game.board)
 
     while True:
-        if is_checkmate(current_game):
-            if current_game.current_player_turn == 1:
-                print("Checkmate, Black wins")
-                break
-            else:
-                print("Checkmate, White wins")
-                break
+        if game_ended(current_game):
+            break
 
         notation = input("Make Your Move " + str(current_game.current_player_turn) + ": ")
         move = chess_notation_translator(notation, current_game)
@@ -20,6 +15,8 @@ def main():
             continue
 
         make_move(current_game, move[0], move[1])
+
+        # Gives proper response depending on the move outcome(valid or invalid, check or not)
         if current_game.move_feedback == "Success":
             print_board(current_game.board)
         elif current_game.move_feedback == "Check":
@@ -27,12 +24,11 @@ def main():
             print(current_game.move_feedback)
         else:
             print(current_game.move_feedback)
+            continue
 
-    print("Ex:")
-    print("White: [piece, starting position, ending position], Black: [piece, starting position, ending position]")
-    for row in current_game.moves:
-        print(row)
+        update_repitition_states(current_game, move, notation)
 
+    end_statement(current_game)
 
 
 # Stores chess game info
@@ -66,6 +62,8 @@ class chess:
         self.current_player_turn = 1
 
         self.move_feedback = ""
+
+        self.is_repitition_states = []
 
 
 class pawn:
@@ -1286,5 +1284,100 @@ def castle(value, game, start_pos, end_pos):
             game.board[7][0] = 0
             game.board[7][3] = 5
 
+
+def copy_board(board):
+    copy = ([   [-5,-3, -3.25, -9, -10, -3.25, -3, -5],
+                [-1,-1, -1,    -1,  -1, -1,    -1, -1],
+                [ 0, 0,  0,     0,   0,  0,     0,  0],
+                [ 0, 0,  0,     0,   0,  0,     0,  0],
+                [ 0, 0,  0,     0,   0,  0,     0,  0],
+                [ 0, 0,  0,     0,   0,  0,     0,  0],
+                [ 1, 1,  1,     1,   1,  1,     1,  1],
+                [ 5, 3,  3.25,  9,  10,  3.25,  3,  5]])
+    
+    for row in range(0, 8):
+        for col in range(0, 8):
+            copy[row][col] = board[row][col]
+
+    return copy
+
+
+def is_stalemate(game):
+    piece = None
+    moves = []
+    legal__moves = []
+
+    if game.current_player_turn == -1:
+        for row in range(0, 8):
+            for col in range(0, 8):
+                if game.board[row][col] < 0:
+                    piece = piece_caller(game.board[row][col])
+                    moves = piece.legal_moves([row, col], game)
+                    for move in moves:
+                        if not in_check(game, [row, col], move):
+                            legal__moves.append(move)
+    else:
+        for row in range(0, 8):
+            for col in range(0, 8):
+                if game.board[row][col] > 0:
+                    piece = piece_caller(game.board[row][col])
+                    moves = piece.legal_moves([row, col], game)
+                    for move in moves:
+                        if not in_check(game, [row, col], move):
+                            legal__moves.append(move)
+
+
+def is_repitition(game):
+    len_states = len(game.is_repitition_states)
+
+    for index in range(0, len_states):
+        counter = 0
+        for index_cmp in range(0, len_states):
+            if index != index_cmp:
+                if game.is_repitition_states[index] == game.is_repitition_states[index_cmp]:
+                    counter += 1
+                    if counter == 3:
+                        return True
+                    
+    return False
+
+
+def game_ended(game):
+    if is_checkmate(game):
+        if game.current_player_turn == 1:
+            print("Checkmate, Black wins")
+            return True
+        else:
+            print("Checkmate, White wins")
+            return True
+    elif is_stalemate(game):
+        if game.current_player_turn == 1:
+            print("Stalemate, White has no legal moves")
+            return True
+        else:
+            print("Stalemate, Black has no legal moves")
+            return True
+    elif is_repitition(game):
+        print("Draw by repitition")
+        return True
+    else:
+        return False
+            
+
+def end_statement(game):
+    print("Ex:")
+    print("White: [piece, starting position, ending position], Black: [piece, starting position, ending position]")
+    for row in game.moves:
+        print(row)
+
+
+def update_repitition_states(game, move, notation):
+    if (abs(game.board[move[1][0]][move[1][1]]) == 1) or is_capture_notation(notation):
+        game.is_repitition_states = []
+
+    (game.is_repitition_states).append(copy_board(game.board))
+
+    return
+    
 
 main()
