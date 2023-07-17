@@ -5,7 +5,7 @@ print("Mode: ")
 config = input("1: AI, 2: Human: ")
 
 while (config != "1") and (config != "2"):
-    print("Type '1' for AI mode of '2' for human mode")
+    print("Type '1' for AI mode or '2' for human mode")
     config = input("1: AI, 2: Human: ")
 
 
