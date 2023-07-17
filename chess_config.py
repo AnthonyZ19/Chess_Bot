@@ -1,3 +1,4 @@
+"""
 print("Configurate use: ")
 print("Mode: ")
 config = input("1: AI, 2: Human: ")
@@ -43,7 +44,7 @@ def main(mode):
     else:
         while not game_ended(current_game):
             make_move(current_game)
-
+"""
 
 # Stores chess game info
 class chess:
@@ -1420,7 +1421,3 @@ def find_moves(game):
                             
 
     return verified_moves
-
-
-if config == "1":
-    main(1)
