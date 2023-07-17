@@ -14,8 +14,8 @@ current_game = cc.chess()
 
 if config == "1":
     while not cc.game_ended(current_game):
-        cc.make_move(current_game)
-
+        print("Mode isn't finished, yet")
+        break
 else:
     cc.print_board(current_game.board)
 
