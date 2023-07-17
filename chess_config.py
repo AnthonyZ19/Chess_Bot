@@ -1,34 +1,48 @@
-def main():
+print("Configurate use: ")
+print("Mode: ")
+config = input("1: AI, 2: Human: ")
+
+while (config != "1") and (config != "2"):
+    print("Type '1' for AI mode of '2' for human mode")
+    config = input("1: AI, 2: Human: ")
+
+def main(mode):
     current_game = chess()
 
-    print_board(current_game.board)
+    if mode == 1:
 
-    while True:
-        if game_ended(current_game):
-            break
+        print_board(current_game.board)
 
-        notation = input("Make Your Move " + str(current_game.current_player_turn) + ": ")
-        move = chess_notation_translator(notation, current_game)
+        test = find_moves(current_game)
+        for t in test:
+            print(t)
 
-        if not move:
-            print(current_game.move_feedback)
-            continue
+        while not game_ended(current_game):
+            notation = input("Make Your Move " + str(current_game.current_player_turn) + ": ")
+            move = chess_notation_translator(notation, current_game)
 
-        make_move(current_game, move[0], move[1])
+            if not move:
+                print(current_game.move_feedback)
+                continue
 
-        # Gives proper response depending on the move outcome(valid or invalid, check or not)
-        if current_game.move_feedback == "Success":
-            print_board(current_game.board)
-        elif current_game.move_feedback == "Check":
-            print_board(current_game.board)
-            print(current_game.move_feedback)
-        else:
-            print(current_game.move_feedback)
-            continue
+            make_move(current_game, move[0], move[1])
 
-        update_repitition_states(current_game, move, notation)
+            # Gives proper response depending on the move outcome(valid or invalid, check or not)
+            if current_game.move_feedback == "Success":
+                print_board(current_game.board)
+            elif current_game.move_feedback == "Check":
+                print_board(current_game.board)
+                print(current_game.move_feedback)
+            else:
+                print(current_game.move_feedback)
+                continue
 
-    end_statement(current_game)
+            update_repitition_states(current_game, move, notation)
+
+        end_statement(current_game)
+    else:
+        while not game_ended(current_game):
+            make_move(current_game)
 
 
 # Stores chess game info
@@ -1380,4 +1394,33 @@ def update_repitition_states(game, move, notation):
     return
     
 
-main()
+def find_moves(game):
+    verified_moves = []
+
+    if game.current_player_turn == -1:
+        for row in range(0, 8):
+            for col in range(0, 8):
+                if game.board[row][col] < 0:
+                    piece = piece_caller(game.board[row][col])
+                    moves = piece.legal_moves([row, col], game)
+
+                    for move in moves:
+                        if not in_check(game, [row, col], move):
+                            verified_moves.append(move)
+    else:
+        for row in range(0, 8):
+            for col in range(0, 8):
+                if game.board[row][col] > 0:
+                    piece = piece_caller(game.board[row][col])
+                    moves = piece.legal_moves([row, col], game)
+
+                    for move in moves:
+                        if not in_check(game, [row, col], move):
+                            verified_moves.append([num_to_letter(piece.value), move])
+                            
+
+    return verified_moves
+
+
+if config == "1":
+    main(1)
