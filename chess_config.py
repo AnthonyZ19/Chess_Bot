@@ -1,51 +1,3 @@
-"""
-print("Configurate use: ")
-print("Mode: ")
-config = input("1: AI, 2: Human: ")
-
-while (config != "1") and (config != "2"):
-    print("Type '1' for AI mode of '2' for human mode")
-    config = input("1: AI, 2: Human: ")
-
-def main(mode):
-    current_game = chess()
-
-    if mode == 1:
-
-        print_board(current_game.board)
-
-        test = find_moves(current_game)
-        for t in test:
-            print(t)
-
-        while not game_ended(current_game):
-            notation = input("Make Your Move " + str(current_game.current_player_turn) + ": ")
-            move = chess_notation_translator(notation, current_game)
-
-            if not move:
-                print(current_game.move_feedback)
-                continue
-
-            make_move(current_game, move[0], move[1])
-
-            # Gives proper response depending on the move outcome(valid or invalid, check or not)
-            if current_game.move_feedback == "Success":
-                print_board(current_game.board)
-            elif current_game.move_feedback == "Check":
-                print_board(current_game.board)
-                print(current_game.move_feedback)
-            else:
-                print(current_game.move_feedback)
-                continue
-
-            update_repitition_states(current_game, move, notation)
-
-        end_statement(current_game)
-    else:
-        while not game_ended(current_game):
-            make_move(current_game)
-"""
-
 # Stores chess game info
 class chess:
     def __init__(self):
@@ -96,11 +48,13 @@ class pawn:
             # Ensures that these moves aren't included when checking for checks since the pawn can't capture like this
             if not checking_check:
                 # Checks if the piece can move forward
-                if board_state[(position[0] + 1)][position[1]] == 0:
-                    pawn_moves.append([(position[0] + 1), position[1]])
-                    if position[0] == 1:
-                        if board_state[(position[0] + 2)][position[1]] == 0:
-                            pawn_moves.append([(position[0] + 2), position[1]])
+                if ((position[0] + 1) < 8) and ((position[0] + 1) >= 0):
+                    if board_state[(position[0] + 1)][position[1]] == 0:
+                        pawn_moves.append([(position[0] + 1), position[1]])
+                        if position[0] == 1:
+                            if ((position[0] + 2) < 8) and ((position[0] + 2) >= 0):
+                                if board_state[(position[0] + 2)][position[1]] == 0:
+                                    pawn_moves.append([(position[0] + 2), position[1]])
 
             # Checks if the pawn can take any pieces
             if (position[0] < 7) and (position[1] < 7):
@@ -125,11 +79,13 @@ class pawn:
             # Ensures that these moves aren't included when checking for checks since the pawn can't capture like this
             if not checking_check:
                 # Checks if it can move forward
-                if board_state[(position[0] - 1)][position[1]] == 0:
-                    pawn_moves.append([(position[0] - 1), position[1]])
-                    if position[0] == 6:
-                        if board_state[(position[0] - 2)][position[1]] == 0:
-                            pawn_moves.append([(position[0] - 2), position[1]])
+                if ((position[0] - 1) < 8) and ((position[0] - 1) >= 0):
+                    if board_state[(position[0] - 1)][position[1]] == 0:
+                        pawn_moves.append([(position[0] - 1), position[1]])
+                        if position[0] == 6:
+                            if ((position[0] - 2) < 8) and ((position[0] - 2) >= 0):
+                                if board_state[(position[0] - 2)][position[1]] == 0:
+                                    pawn_moves.append([(position[0] - 2), position[1]])
 
             # Checks if the piece can take another
             if (position[0] > 0) and (position[1] < 7):
@@ -546,25 +502,27 @@ class king:
             if not(game.black_king_moved):
                 # Checks long castle
                 if not(game.rook_a8_moved):
-                    if (board_state[position[0]][position[1] - 1] == 0) and (board_state[position[0]][position[1] - 2] == 0) and (board_state[position[0]][position[1] - 3] == 0):
-                        if not checking_check:
-                            # Checks if the square is attacked by enemy pieces
-                            if not in_check(game, "attack", [position[0], position[1] - 1]):
-                                if not in_check(game, "attack", [position[0], (position[1] - 2)]):
-                                    if not in_check(game, "attack", [position[0], position[1] - 3]):
-                                        king_moves.append([position[0], (position[1] - 2)])
-                        else:
-                            king_moves.append([position[0], (position[1] - 2)])
+                    if ((position[1] - 1) >= 0) and ((position[1] - 2) >= 0):
+                        if (board_state[position[0]][position[1] - 1] == 0) and (board_state[position[0]][position[1] - 2] == 0) and (board_state[position[0]][position[1] - 3] == 0):
+                            if not checking_check:
+                                # Checks if the square is attacked by enemy pieces
+                                if not in_check(game, "attack", [position[0], position[1] - 1]):
+                                    if not in_check(game, "attack", [position[0], (position[1] - 2)]):
+                                        if not in_check(game, "attack", [position[0], position[1] - 3]):
+                                            king_moves.append([position[0], (position[1] - 2)])
+                            else:
+                                king_moves.append([position[0], (position[1] - 2)])
                 # Checks short castle
                 if not(game.rook_h8_moved):
-                    if (board_state[position[0]][position[1] + 1] == 0) and (board_state[position[0]][position[1] + 2] == 0):
-                        if not checking_check:
-                            # Checks if the square is attacked by enemy pieces
-                            if not in_check(game, "attack", [position[0], position[1] + 1]):
-                                if not in_check(game, "attack", [position[0], (position[1] + 2)]):
-                                    king_moves.append([position[0], (position[1] + 2)])
-                        else:
-                            king_moves.append([position[0], (position[1] + 2)])
+                    if ((position[1] + 1) < 8) and ((position[1] + 2) < 8):
+                        if (board_state[position[0]][position[1] + 1] == 0) and (board_state[position[0]][position[1] + 2] == 0):
+                            if not checking_check:
+                                # Checks if the square is attacked by enemy pieces
+                                if not in_check(game, "attack", [position[0], position[1] + 1]):
+                                    if not in_check(game, "attack", [position[0], (position[1] + 2)]):
+                                        king_moves.append([position[0], (position[1] + 2)])
+                            else:
+                                king_moves.append([position[0], (position[1] + 2)])
         else:
             # Loops through all the squares around the king
             for y in [-1, 0, 1]:
@@ -583,26 +541,28 @@ class king:
             if not(game.white_king_moved):
                 # Checks long castle
                 if not(game.rook_a1_moved):
-                    if (board_state[position[0]][position[1] - 1] == 0) and (board_state[position[0]][position[1] - 2] == 0) and (board_state[position[0]][position[1] - 3] == 0):
-                        if not checking_check:
-                            # Checks if the square is attacked by enemy pieces
-                            if not in_check(game, "attack", [position[0], position[1] - 1]):
-                                if not in_check(game, "attack", [position[0], (position[1] - 2)]):
-                                    if not in_check(game, "attack", [position[0], position[1] - 3]):
-                                        king_moves.append([position[0], (position[1] - 2)])
-                        else:
-                            king_moves.append([position[0], (position[1] - 2)])
+                    if ((position[1] - 1) >= 0) and ((position[1] - 2) >= 0):
+                        if (board_state[position[0]][position[1] - 1] == 0) and (board_state[position[0]][position[1] - 2] == 0) and (board_state[position[0]][position[1] - 3] == 0):
+                            if not checking_check:
+                                # Checks if the square is attacked by enemy pieces
+                                if not in_check(game, "attack", [position[0], position[1] - 1]):
+                                    if not in_check(game, "attack", [position[0], (position[1] - 2)]):
+                                        if not in_check(game, "attack", [position[0], position[1] - 3]):
+                                            king_moves.append([position[0], (position[1] - 2)])
+                            else:
+                                king_moves.append([position[0], (position[1] - 2)])
                         
                 # Checks short castle
                 if not(game.rook_h1_moved):
-                    if (board_state[position[0]][position[1] + 1] == 0) and (board_state[position[0]][position[1] + 2] == 0):
-                        if not checking_check:
-                            # Checks if the square is attacked by enemy pieces
-                            if not in_check(game, "attack", [position[0], position[1] + 1]):
-                                if not in_check(game, "attack", [position[0], (position[1] + 2)]):
-                                    king_moves.append([position[0], (position[1] + 2)])
-                        else:
-                            king_moves.append([position[0], (position[1] + 2)])
+                    if ((position[1] + 1) < 8) and ((position[1] + 2) < 8):
+                        if (board_state[position[0]][position[1] + 1] == 0) and (board_state[position[0]][position[1] + 2] == 0):
+                            if not checking_check:
+                                # Checks if the square is attacked by enemy pieces
+                                if not in_check(game, "attack", [position[0], position[1] + 1]):
+                                    if not in_check(game, "attack", [position[0], (position[1] + 2)]):
+                                        king_moves.append([position[0], (position[1] + 2)])
+                            else:
+                                king_moves.append([position[0], (position[1] + 2)])
 
         return king_moves
 
@@ -1027,7 +987,6 @@ def make_move(game, start_pos, end_pos):
         game.move_feedback = "Error: empty ending position"
         return False
     else:
-        
         piece = piece_caller(game.board[start_pos[0]][start_pos[1]])
 
         if abs(piece.value) == 10:
@@ -1042,10 +1001,9 @@ def make_move(game, start_pos, end_pos):
             
             else:
                 # Checks that the piece is the black king
-                if piece.value == -10:
-                    castling = True
-                elif piece.value == 10:
-                    castling = True
+                if abs(piece.value) == 10:
+                    if ((start_pos[1] - 2) == end_pos[1]) or ((start_pos[1] + 2) == end_pos[1]):
+                        castling = True
                 elif piece.value == -1:
                     # Checks if the pawn moved 2 squares
                     if (end_pos[0] - 2) == start_pos[0]:
@@ -1144,14 +1102,16 @@ def num_to_letter(value):
     
 
 def print_board(board):
+    m_board = []
     modified_row = []
 
     for row in board:
-        #print(row)
         for col in row:
             modified_row.append(num_to_letter(col))
         print(modified_row)
+        m_board.append(modified_row)
         modified_row = []
+    #return m_board
 
 
 def find_king(value, board):
@@ -1180,7 +1140,7 @@ def is_checkmate(game):
     else:
         for row in range(0, 8):
             for col in range(0 ,8):
-                if game.board[row][col] > 0:
+               if game.board[row][col] > 0:
                     piece = piece_caller(game.board[row][col])
 
                     moves = []
@@ -1357,23 +1317,28 @@ def is_repitition(game):
     return False
 
 
-def game_ended(game):
+def game_ended(game, AI = False):
     if is_checkmate(game):
         if game.current_player_turn == 1:
-            print("Checkmate, Black wins")
+            if not AI:
+                print("Checkmate, Black wins")
             return True
         else:
-            print("Checkmate, White wins")
+            if not AI:
+                print("Checkmate, White wins")
             return True
     elif is_stalemate(game):
         if game.current_player_turn == 1:
-            print("Stalemate, White has no legal moves")
+            if not AI:
+                print("Stalemate, White has no legal moves")
             return True
         else:
-            print("Stalemate, Black has no legal moves")
+            if not AI:
+                print("Stalemate, Black has no legal moves")
             return True
     elif is_repitition(game):
-        print("Draw by repitition")
+        if not AI:
+            print("Draw by repitition")
         return True
     else:
         return False
@@ -1407,7 +1372,7 @@ def find_moves(game):
 
                     for move in moves:
                         if not in_check(game, [row, col], move):
-                            verified_moves.append(move)
+                            verified_moves.append([[row, col], move])
     else:
         for row in range(0, 8):
             for col in range(0, 8):
@@ -1417,7 +1382,7 @@ def find_moves(game):
 
                     for move in moves:
                         if not in_check(game, [row, col], move):
-                            verified_moves.append([num_to_letter(piece.value), move])
+                            verified_moves.append([[row, col], move])
                             
 
     return verified_moves
