@@ -1,4 +1,5 @@
 import chess_config as cc
+import MCTS
 
 print("Configurate use: ")
 print("Mode: ")
@@ -13,15 +14,56 @@ while (config != "1") and (config != "2"):
 current_game = cc.chess()
 
 if config == "1":
-    while not cc.game_ended(current_game):
-        print("Mode isn't finished, yet")
-        break
+    c_value = 1.4
+    searches = 1
+    mcts = MCTS.mcts(current_game, c_value, searches)
+    cc.print_board(current_game.board)
+    print(" ")
+    while True:
+
+        if current_game.current_player_turn == 1:
+            notation = input("Make Your Move " + str(current_game.current_player_turn) + ": ")
+            move = cc.chess_notation_translator(notation, current_game)
+
+            if not move:
+                print(current_game.move_feedback)
+                continue
+
+            cc.make_move(current_game, move[0], move[1])
+            # Gives proper response depending on the move outcome(valid or invalid, check or not)
+            if cc.game_ended(current_game):
+                for move in current_game.moves:
+                    print(move)
+                break
+            elif current_game.move_feedback == "Success":
+                cc.print_board(current_game.board)
+                print(" ")
+            elif current_game.move_feedback == "Check":
+                cc.print_board(current_game.board)
+                print(current_game.move_feedback)
+                print(" ")
+            else:
+                print(current_game.move_feedback)
+                continue
+
+            cc.update_repitition_states(current_game, move, notation)
+        else:
+            mcts_probs = mcts.search()
+            move = []
+            visits = 0
+            for action in mcts_probs:
+                if action[1] > visits:
+                    move = action[0]
+                    visits = action[1]
+            cc.make_move(current_game, move[0], move[1])
+            cc.print_board(current_game.board)
+            print(" ")
+            if cc.game_ended(current_game):
+                for move in current_game.moves:
+                    print(move)
+                break
 else:
     cc.print_board(current_game.board)
-
-    test = cc.find_moves(current_game)
-    for t in test:
-        print(t)
 
     while not cc.game_ended(current_game):
         notation = input("Make Your Move " + str(current_game.current_player_turn) + ": ")
@@ -34,7 +76,10 @@ else:
         cc.make_move(current_game, move[0], move[1])
 
         # Gives proper response depending on the move outcome(valid or invalid, check or not)
-        if current_game.move_feedback == "Success":
+        if cc.game_ended(current_game):
+                print(current_game.moves)
+                break
+        elif current_game.move_feedback == "Success":
             cc.print_board(current_game.board)
         elif current_game.move_feedback == "Check":
             cc.print_board(current_game.board)
