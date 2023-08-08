@@ -1,15 +1,17 @@
+import copy
+
 # Stores chess game info
 class chess:
     def __init__(self):
         self.moves = []
         
-        self.board = ([ [-5,-3, -3.25, -9, -10, -3.25, -3, -5],
-                        [-1,-1, -1,    -1,  -1, -1,    -1, -1],
+        self.board = ([ [ 0,-3, -3.25, -9, -10, -3.25, -3, -5],
+                        [ 1,-1, -1,    -1,  -1, -1,    -1, -1],
                         [ 0, 0,  0,     0,   0,  0,     0,  0],
                         [ 0, 0,  0,     0,   0,  0,     0,  0],
                         [ 0, 0,  0,     0,   0,  0,     0,  0],
                         [ 0, 0,  0,     0,   0,  0,     0,  0],
-                        [ 1, 1,  1,     1,   1,  1,     1,  1],
+                        [ 0, 1,  1,     1,   1,  1,     1,  1],
                         [ 5, 3,  3.25,  9,  10,  3.25,  3,  5]])
         
         self.white_king_moved = False
@@ -50,7 +52,13 @@ class pawn:
                 # Checks if the piece can move forward
                 if ((position[0] + 1) < 8) and ((position[0] + 1) >= 0):
                     if board_state[(position[0] + 1)][position[1]] == 0:
-                        pawn_moves.append([(position[0] + 1), position[1]])
+                        if position[0] == 6:
+                            pawn_moves.append([(position[0] + 1), position[1], -5])
+                            pawn_moves.append([(position[0] + 1), position[1], -3])
+                            pawn_moves.append([(position[0] + 1), position[1], -3.25])
+                            pawn_moves.append([(position[0] + 1), position[1], -9])
+                        else:
+                            pawn_moves.append([(position[0] + 1), position[1]])
                         if position[0] == 1:
                             if ((position[0] + 2) < 8) and ((position[0] + 2) >= 0):
                                 if board_state[(position[0] + 2)][position[1]] == 0:
@@ -59,15 +67,27 @@ class pawn:
             # Checks if the pawn can take any pieces
             if (position[0] < 7) and (position[1] < 7):
                 if board_state[(position[0] + 1)][position[1] + 1] > 0:
-                    pawn_moves.append([(position[0] + 1), (position[1] + 1)])
+                    if position[0] == 6:
+                        pawn_moves.append([(position[0] + 1), (position[1] + 1), -5])
+                        pawn_moves.append([(position[0] + 1), (position[1] + 1), -3])
+                        pawn_moves.append([(position[0] + 1), (position[1] + 1), -3.25])
+                        pawn_moves.append([(position[0] + 1), (position[1] + 1), -9])
+                    else:
+                        pawn_moves.append([(position[0] + 1), (position[1] + 1)])
 
             if (position[0] < 7) and (position[1] > 0):
                 if board_state[(position[0] + 1)][position[1] - 1] > 0:
-                    pawn_moves.append([(position[0] + 1), (position[1] - 1)])
+                    if position[0] == 6:
+                        pawn_moves.append([(position[0] + 1), (position[1] - 1), -5])
+                        pawn_moves.append([(position[0] + 1), (position[1] - 1), -3])
+                        pawn_moves.append([(position[0] + 1), (position[1] - 1), -3.25])
+                        pawn_moves.append([(position[0] + 1), (position[1] - 1), -9])
+                    else:
+                        pawn_moves.append([(position[0] + 1), (position[1] - 1)])
 
             if game.moves:
                 if game.last_move_en_passant:
-                    passant_pawn_pos = (game.moves[len(game.moves) - 2])["White"][2]
+                    passant_pawn_pos = (game.moves[len(game.moves) - 1])["White"][2]
                     if passant_pawn_pos[0] == position[0]:
                         if passant_pawn_pos[1] == (position[1] + 1):
                             pawn_moves.append([(position[0] + 1), (position[1] + 1)])
@@ -81,7 +101,13 @@ class pawn:
                 # Checks if it can move forward
                 if ((position[0] - 1) < 8) and ((position[0] - 1) >= 0):
                     if board_state[(position[0] - 1)][position[1]] == 0:
-                        pawn_moves.append([(position[0] - 1), position[1]])
+                        if position[0] == 1:
+                            pawn_moves.append([(position[0] - 1), position[1], 5])
+                            pawn_moves.append([(position[0] - 1), position[1], 3])
+                            pawn_moves.append([(position[0] - 1), position[1], 3.25])
+                            pawn_moves.append([(position[0] - 1), position[1], 9])
+                        else:
+                            pawn_moves.append([(position[0] - 1), position[1]])
                         if position[0] == 6:
                             if ((position[0] - 2) < 8) and ((position[0] - 2) >= 0):
                                 if board_state[(position[0] - 2)][position[1]] == 0:
@@ -90,20 +116,37 @@ class pawn:
             # Checks if the piece can take another
             if (position[0] > 0) and (position[1] < 7):
                 if board_state[(position[0] - 1)][position[1] + 1] < 0:
-                    pawn_moves.append([(position[0] - 1), (position[1] + 1)])
+                    if position[0] == 1:
+                        pawn_moves.append([(position[0] - 1), (position[1] + 1), 5])
+                        pawn_moves.append([(position[0] - 1), (position[1] + 1), 3])
+                        pawn_moves.append([(position[0] - 1), (position[1] + 1), 3.25])
+                        pawn_moves.append([(position[0] - 1), (position[1] + 1), 9])
+                    else:
+                        pawn_moves.append([(position[0] - 1), (position[1] + 1)])
 
             if (position[0] > 0) and (position[1] > 0):
                 if board_state[(position[0] - 1)][position[1] - 1] < 0:
-                    pawn_moves.append([(position[0] - 1), (position[1] - 1)])
+                    if position[0] == 1:
+                        pawn_moves.append([(position[0] - 1), (position[1] - 1), 5])
+                        pawn_moves.append([(position[0] - 1), (position[1] - 1), 3])
+                        pawn_moves.append([(position[0] - 1), (position[1] - 1), 3.25])
+                        pawn_moves.append([(position[0] - 1), (position[1] - 1), 9])
+                    else:
+                        pawn_moves.append([(position[0] - 1), (position[1] - 1)])
 
             if len(game.moves) > 1:
-                if game.last_move_en_passant:
-                    passant_pawn_pos = (game.moves[len(game.moves) - 2])["Black"][2]
-                    if passant_pawn_pos[0] == position[0]:
-                        if passant_pawn_pos[1] == (position[1] + 1):
-                            pawn_moves.append([(position[0] - 1), (position[1] + 1)])
-                        elif passant_pawn_pos[1] == (position[1] - 1):
-                            pawn_moves.append([(position[0] - 1), (position[1] - 1)])
+                if len(game.moves[0]) > 1:
+                    if game.last_move_en_passant:
+                        passant_pawn_pos = []
+                        try:
+                            passant_pawn_pos = (game.moves[len(game.moves) - 1])["Black"][2]
+                        except:
+                            passant_pawn_pos = (game.moves[len(game.moves) - 2])["Black"][2]
+                        if passant_pawn_pos[0] == position[0]:
+                            if passant_pawn_pos[1] == (position[1] + 1):
+                                pawn_moves.append([(position[0] - 1), (position[1] + 1)])
+                            elif passant_pawn_pos[1] == (position[1] - 1):
+                                pawn_moves.append([(position[0] - 1), (position[1] - 1)])
 
         return pawn_moves
 
@@ -493,7 +536,7 @@ class king:
                             if board_state[(position[0] + y)][(position[1] + x)] >= 0:
                                 if not checking_check:
                                     # Checks if the square is attacked by enemy pieces
-                                    if not in_check(game, "attack", [(position[0] + y), (position[1] + x)]):
+                                    if not in_check(game, position, [(position[0] + y), (position[1] + x)]):
                                         king_moves.append([(position[0] + y), (position[1] + x)])
                                 else:
                                     king_moves.append([(position[0] + y), (position[1] + x)])
@@ -618,11 +661,10 @@ def is_checkmate_notation(notation):
 def in_check(game, start_pos, end_pos):
     # Makes the tested move in order to check for checks
     king_position = []
-    board_state = []
-    if start_pos == "attack":
-        board_state = game.board
-    else:
-        board_state = simulate_move(game, start_pos, end_pos)
+    game_copy = copy.deepcopy(game)
+    board_state = game_copy.board
+    if not (start_pos == "attack"):
+        make_move(game_copy, start_pos, end_pos, True)
 
     # Checks for checks for the black pieces
     if game.current_player_turn == -1:
@@ -631,6 +673,7 @@ def in_check(game, start_pos, end_pos):
             for col in range(0, 8):
                 if board_state[row][col] == -10:
                     king_position = [row, col]
+                    break
         # Iterates through each row and square
         for row in range(0, 8):
             for col in range(0, 8):
@@ -639,16 +682,19 @@ def in_check(game, start_pos, end_pos):
                     # If yes, it calls that piece and checks it's legal moves
                     enemy_piece = piece_caller(board_state[row][col])
                     if (abs(enemy_piece.value) == 10) or (abs(enemy_piece.value) == 1):
-                        enemy_moves = enemy_piece.legal_moves([row, col], game, True)
+                        enemy_moves = enemy_piece.legal_moves([row, col], game_copy, True)
                     else:
-                        enemy_moves = enemy_piece.legal_moves([row, col], game)
+                        enemy_moves = enemy_piece.legal_moves([row, col], game_copy)
 
+                    # If any of it's moves hits the king, if it were to move into that square
+                    #  then True is returned
                     if start_pos == "attack":
-                        if end_pos in enemy_moves:
-                            return True
+                        if end_pos == "king pos":
+                            if king_position in enemy_moves:
+                                return True
+                            elif end_pos in enemy_moves:
+                                return True
                     else:
-                        # If any of it's moves hits the king, if it were to move into that square
-                        #  then True is returned
                         if king_position in enemy_moves:
                             return True
     # Same as before, but for white
@@ -657,6 +703,7 @@ def in_check(game, start_pos, end_pos):
             for col in range(0, 8):
                 if board_state[row][col] == 10:
                     king_position = [row, col]
+                    break
         # Iterates through each row and square
         for row in range(0, 8):
             for col in range(0, 8):
@@ -665,16 +712,16 @@ def in_check(game, start_pos, end_pos):
                     # If yes, it calls that piece and checks it's legal moves
                     enemy_piece = piece_caller(board_state[row][col])
                     if (enemy_piece.value == -10) or (enemy_piece.value == -1):
-                        enemy_moves = enemy_piece.legal_moves([row, col], game, True)
+                        enemy_moves = enemy_piece.legal_moves([row, col], game_copy, True)
                     else:
-                        enemy_moves = enemy_piece.legal_moves([row, col], game)
+                        enemy_moves = enemy_piece.legal_moves([row, col], game_copy)
 
+                    # If any of it's moves hits the king, if it were to move into that square
+                    #  then True is returned
                     if start_pos == "attack":
                         if end_pos in enemy_moves:
                             return True
                     else:
-                        # If any of it's moves hits the king, if it were to move into that square
-                        #  then True is returned
                         if king_position in enemy_moves:
                             return True
     # If none of the enemy pieces hit's the king were it to move into that square
@@ -718,6 +765,7 @@ def letter_to_index(letter):
 def chess_notation_translator(notation, game):
     turn = game.current_player_turn
     piece = None
+    promotion_value = 0
     found = False
     true_row = 8
 
@@ -936,33 +984,41 @@ def chess_notation_translator(notation, game):
                 else:
                     moves = piece.legal_moves([row, col], game)
 
-                if not (start_pos_col == None):
-                    if ([end_pos_row, end_pos_col] in moves) and col == start_pos_col:
+                for move in moves:
+                    if not (start_pos_col == None):
+                        if ([end_pos_row, end_pos_col] == [move[0], move[1]]) and (col == start_pos_col):
+                            start_pos_row = row
+                            start_pos_col = col
+                            found = True
+                    elif not (start_pos_row == None):
+                        if ([end_pos_row, end_pos_col] == [move[0], move[1]]) and (row == start_pos_row):
+                            start_pos_col = col
+                            start_pos_row = row
+                            found = True
+                    elif [end_pos_row, end_pos_col] == [move[0], move[1]]:
                         start_pos_row = row
                         start_pos_col = col
                         found = True
-                elif not (start_pos_row == None):
-                    if ([end_pos_row, end_pos_col] in moves) and row == start_pos_row:
-                        start_pos_col = col
-                        start_pos_row = row
-                        found = True
-                elif [end_pos_row, end_pos_col] in moves:
-                    start_pos_row = row
-                    start_pos_col = col
-                    found = True
-                elif [row, col] == [8, 8]:
-                    game.move_feedback = "Couldn't find move"
-                    return False
+                    elif [row, col] == [8, 8]:
+                        game.move_feedback = "Couldn't find move"
+                        return False
                     
     if found:
         game.move_feedback = "Valid Notation"
-        return [[start_pos_row, start_pos_col], [end_pos_row, end_pos_col]]
+        if (abs(piece.value) == 1) and ((end_pos_row == 0) or (end_pos_row == 7)):
+                    promotion = input("What piece are you promoting to('Q', 'R', 'B', 'N')? ")
+                    while not (promotion in ['Q', 'R', 'B', 'N']):
+                        promotion = input("What piece are you promoting to('Q', 'R', 'B', 'N')? ")
+                    return [[start_pos_row, start_pos_col], [end_pos_row, end_pos_col, (letter_to_piece(promotion, game.current_player_turn)).value]]
+
+        else:
+            return [[start_pos_row, start_pos_col], [end_pos_row, end_pos_col]]
     else:
         game.move_feedback = "Invalid notation and/or move"
         return False
 
 
-def make_move(game, start_pos, end_pos):
+def make_move(game, start_pos, end_pos, checking_check = False):
     game.move_feedback = "Move Error"
     en_passant = False
     castling = False
@@ -995,77 +1051,83 @@ def make_move(game, start_pos, end_pos):
             legal_moves = piece.legal_moves(start_pos, game)
 
         if end_pos in legal_moves:
-            if in_check(game, start_pos, end_pos):
-                game.move_feedback = "This move leaves you in check"
-                return False
+            if not checking_check:
+                if in_check(game, start_pos, end_pos):
+                    game.move_feedback = "This move leaves you in check"
+                    return False
             
-            else:
-                # Checks that the piece is the black king
-                if abs(piece.value) == 10:
-                    if ((start_pos[1] - 2) == end_pos[1]) or ((start_pos[1] + 2) == end_pos[1]):
-                        castling = True
-                elif piece.value == -1:
-                    # Checks if the pawn moved 2 squares
-                    if (end_pos[0] - 2) == start_pos[0]:
-                        en_passant = True
-                elif piece.value == 1:
-                    # Checks if the pawn moved 2 squares
-                    if (end_pos[0] + 2) == start_pos[0]:
-                        en_passant = True
-                # Records the move
-                if game.current_player_turn == 1:
-                    (game.moves).append({"White" : [piece.value, start_pos, end_pos]})
-                    if (piece.value == 5) and (start_pos == [7, 0]):
-                        game.rook_a1_moved == True
-                    elif (piece.value == 5) and (start_pos == [7, 7]):
-                        game.rook_h1_moved == True
-                else:
-                    ((game.moves)[len(game.moves) - 1]).update({"Black": [piece.value, start_pos, end_pos]})
-                    if (piece.value == -5) and (start_pos == [0, 0]):
-                        game.rook_a8_moved == True
-                    elif (piece.value == -5) and (start_pos == [0, 7]):
-                        game.rook_h8_moved == True
+            # Checks that the piece is the black king
+            if abs(piece.value) == 10:
+                if ((start_pos[1] - 2) == end_pos[1]) or ((start_pos[1] + 2) == end_pos[1]):
+                    castling = True
+            elif piece.value == -1:
+                # Checks if the pawn moved 2 squares
+                if (end_pos[0] - 2) == start_pos[0]:
+                    en_passant = True
+            elif piece.value == 1:
+                # Checks if the pawn moved 2 squares
+                if (end_pos[0] + 2) == start_pos[0]:
+                    en_passant = True
 
-                if game.moves:
+            if game.moves:
+                if len(game.moves[0]) > 1:
                     if game.last_move_en_passant:
                         if piece.value == -1:
                             passant_pawn_pos = (game.moves[len(game.moves) - 1])["White"][2]
                             if passant_pawn_pos[0] == start_pos[0]:
-                                if passant_pawn_pos[1] == (start_pos[1] + 1):
-                                    # Clears the enemy pawn if en passant is used
-                                    if game.current_player_turn == -1:
-                                        game.board[end_pos[0] - 1][end_pos[1]] = 0
-                                    else:
-                                        game.board[end_pos[0] + 1][end_pos[1]] = 0
-                                elif passant_pawn_pos[1] == (start_pos[1] - 1):
-                                    # Clears the enemy pawn if en passant is used
-                                    if game.current_player_turn == -1:
-                                        game.board[end_pos[0] - 1][end_pos[1]] = 0
-                                    else:
-                                        game.board[end_pos[0] + 1][end_pos[1]] = 0
+                                # Clears the enemy pawn if en passant is used
+                                game.board[end_pos[0] - 1][end_pos[1]] = 0
+                        elif piece.value == 1:
+                            passant_pawn_pos = []
+                            try:
+                                passant_pawn_pos = (game.moves[len(game.moves) - 1])["Black"][2]
+                            except:
+                                passant_pawn_pos = (game.moves[len(game.moves) - 2])["Black"][2]
 
-                # Changes whos turn it is
-                game.current_player_turn *= -1
+                            if passant_pawn_pos[0] == start_pos[0]:
+                                game.board[end_pos[0] + 1][end_pos[1]] = 0
 
-                if en_passant:
-                    game.last_move_en_passant = True
-                else:
-                    game.last_move_en_passant = False
+            # Records the move
+            if game.current_player_turn == 1:
+                (game.moves).append({"White" : [piece.value, start_pos, end_pos]})
+                if (piece.value == 5) and (start_pos == [7, 0]):
+                    game.rook_a1_moved == True
+                elif (piece.value == 5) and (start_pos == [7, 7]):
+                    game.rook_h1_moved == True
+            else:
+                ((game.moves)[len(game.moves) - 1]).update({"Black": [piece.value, start_pos, end_pos]})
+                if (piece.value == -5) and (start_pos == [0, 0]):
+                    game.rook_a8_moved == True
+                elif (piece.value == -5) and (start_pos == [0, 7]):
+                    game.rook_h8_moved == True
 
-                # Warns the opponent if they're in check
+            # Changes whos turn it is
+            game.current_player_turn *= -1
+
+            if en_passant:
+                game.last_move_en_passant = True
+            else:
+                game.last_move_en_passant = False
+
+            # Warns the opponent if they're in check
+            if not checking_check:
                 if in_check(game, start_pos, end_pos):
                     game.move_feedback = "Check"
                 else:
                     game.move_feedback = "Success"
                 
-                # Plays/makes the move
+            # Plays/makes the move
+            if len(end_pos) == 3:
+                game.board[start_pos[0]][start_pos[1]] = 0
+                game.board[end_pos[0]][end_pos[1]] = end_pos[2]
+            else:
                 game.board[start_pos[0]][start_pos[1]] = 0
                 game.board[end_pos[0]][end_pos[1]] = piece.value
                 
-                if castling:
-                    castle(piece.value, game, start_pos, end_pos)
+            if castling:
+                castle(piece.value, game, start_pos, end_pos)
 
-                return True
+            return True
         else:
             game.move_feedback = "Illegal Move"
             return False
@@ -1120,17 +1182,15 @@ def find_king(value, board):
             if board[row][col] == value:
                 return [row, col]
 
-
-def is_checkmate(game):
-    # Checks if 
+    # Checks if the player has been checkmated
     if game.current_player_turn == -1:
         for row in range(0, 8):
             for col in range(0 ,8):
                 if game.board[row][col] < 0:
                     piece = piece_caller(game.board[row][col])
-
                     moves = []
-                    if abs(piece.value) == 10:
+
+                    if piece.value == -10:
                         moves = piece.legal_moves([row, col], game, True)
                     else:
                         moves = piece.legal_moves([row, col], game)
@@ -1144,7 +1204,7 @@ def is_checkmate(game):
                     piece = piece_caller(game.board[row][col])
 
                     moves = []
-                    if abs(piece.value) == 10:
+                    if piece.value == 10:
                         moves = piece.legal_moves([row, col], game, True)
                     else:
                         moves = piece.legal_moves([row, col], game)
@@ -1154,78 +1214,6 @@ def is_checkmate(game):
                         
     return True
 
-
-def simulate_move(game, start_pos, end_pos):
-    temp_game = chess()
-    simulation = temp_game.board
-    legal_moves = []
-    castling = False
-    en_passant_capture = False
-
-    for row in range(0, 8):
-        for col in range(0, 8):
-            simulation[row][col] = game.board[row][col]
-
-    if not (start_pos):
-        game.move_feedback = "Error: empty starting position"
-        return False
-    if not (end_pos):
-        game.move_feedback = "Error: empty ending position"
-        return False
-    if (not (start_pos[0])) and (start_pos[0] != 0):
-        game.move_feedback = "Error: empty starting position"
-        return False
-    if (not (start_pos[1])) and (start_pos[1] != 0):
-        game.move_feedback = "Error: empty starting position"
-        return False
-    if (not (end_pos[0])) and (end_pos[0] != 0):
-        game.move_feedback = "Error: empty ending position"
-        return False
-    if (not (end_pos[1])) and (end_pos[1] != 0):
-        game.move_feedback = "Error: empty ending position"
-        return False
-            
-    piece = piece_caller(simulation[start_pos[0]][start_pos[1]])
-
-    if abs(piece.value) == 10:
-        legal_moves = piece.legal_moves(start_pos, game, True)
-    else:
-        legal_moves = piece.legal_moves(start_pos, game)
-
-    if end_pos in legal_moves:
-            
-        # Checks that the piece is the black king
-        if piece.value == -10:
-            castling = True
-        elif piece.value == 10:
-            castling = True
-
-        if game.moves:
-            if game.last_move_en_passant:
-                if piece.value == -1:
-                    passant_pawn_pos = (game.moves[len(game.moves) - 1])["White"][2]
-                    if passant_pawn_pos[0] == start_pos[0]:
-                        if passant_pawn_pos[1] == (start_pos[1] + 1):
-                            en_passant_capture = True
-                        elif passant_pawn_pos[1] == (start_pos[1] - 1):
-                            en_passant_capture = True
-
-        # Clears the enemy pawn if en passant is used
-        if en_passant_capture:
-            if game.current_player_turn == -1:
-                simulation[end_pos[0] - 1][end_pos[1]] = 0
-            else:
-                simulation[end_pos[0] + 1][end_pos[1]] = 0
-
-        # Plays/makes the move
-        simulation[start_pos[0]][start_pos[1]] = 0
-        simulation[end_pos[0]][end_pos[1]] = piece.value
-
-        if castling:
-            castle(game.current_player_turn, temp_game, start_pos, end_pos)
-
-        return simulation
-     
 
 def castle(value, game, start_pos, end_pos):
     if value < 0:
@@ -1277,31 +1265,6 @@ def copy_board(board):
     return copy
 
 
-def is_stalemate(game):
-    piece = None
-    moves = []
-    legal__moves = []
-
-    if game.current_player_turn == -1:
-        for row in range(0, 8):
-            for col in range(0, 8):
-                if game.board[row][col] < 0:
-                    piece = piece_caller(game.board[row][col])
-                    moves = piece.legal_moves([row, col], game)
-                    for move in moves:
-                        if not in_check(game, [row, col], move):
-                            legal__moves.append(move)
-    else:
-        for row in range(0, 8):
-            for col in range(0, 8):
-                if game.board[row][col] > 0:
-                    piece = piece_caller(game.board[row][col])
-                    moves = piece.legal_moves([row, col], game)
-                    for move in moves:
-                        if not in_check(game, [row, col], move):
-                            legal__moves.append(move)
-
-
 def is_repitition(game):
     len_states = len(game.is_repitition_states)
 
@@ -1315,34 +1278,37 @@ def is_repitition(game):
                         return True
                     
     return False
-
+            
 
 def game_ended(game, AI = False):
-    if is_checkmate(game):
-        if game.current_player_turn == 1:
-            if not AI:
+    if not AI:
+        if in_check(game, "attack", "king pos") and (len(find_moves(game)) == 0):
+            if game.current_player_turn == 1:
                 print("Checkmate, Black wins")
-            return True
-        else:
-            if not AI:
+            else:
                 print("Checkmate, White wins")
             return True
-    elif is_stalemate(game):
-        if game.current_player_turn == 1:
-            if not AI:
+        elif len(find_moves(game)) == 0:
+            if game.current_player_turn == 1:
                 print("Stalemate, White has no legal moves")
-            return True
-        else:
-            if not AI:
+            else:
                 print("Stalemate, Black has no legal moves")
             return True
-    elif is_repitition(game):
-        if not AI:
+        elif is_repitition(game):
             print("Draw by repitition")
-        return True
+            return True
+        else:
+            return False
     else:
-        return False
-            
+        if in_check(game, "attack", "king pos") and (len(find_moves(game)) == 0):
+            return True
+        elif len(find_moves(game)) == 0:
+            return True
+        elif is_repitition(game):
+            return True
+        else:
+            return False
+
 
 def end_statement(game):
     print("Ex:")
@@ -1383,6 +1349,4 @@ def find_moves(game):
                     for move in moves:
                         if not in_check(game, [row, col], move):
                             verified_moves.append([[row, col], move])
-                            
-
     return verified_moves

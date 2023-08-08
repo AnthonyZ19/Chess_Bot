@@ -17,7 +17,7 @@ class mcts:
 
         # Conducts the specified amount of searches
         for search in range(self.searches):
-            # Resets starting point to the root node
+            # Sets/Resets starting point to the root node
             search_node = root_node
 
             # Looks for a node that isn't fully expanded
@@ -32,13 +32,10 @@ class mcts:
                 # Simulates the rest of the game by selecting random moves
                 value = search_node.simulate()
             else:
-                # If the game has ended value is set to the current player
-                # Since it checks checkmate from the current player perspective
-                # So if player 1 got checkmated, that would be good for the AI who is player 2
-                if cc.is_checkmate(self.game):
+                if cc.in_check(self.game, "attack", "king pos") and (len(cc.find_moves(self.game)) == 0):
                     value = (self.game).current_player_turn
                 else:
-                    value = 0.5
+                    value = 0
             
             # Backpropagates through the nodes to adjust the values
             search_node.backpropagate(value)
@@ -96,30 +93,23 @@ class node:
         for i in range(len(self.expandable_moves) - 1):
             if self.expandable_moves[i] == action:
                 self.expandable_moves.pop(i)
+                break
 
         return route
     
     def simulate(self):
-        if cc.is_checkmate(self.game):
-            value = (self.game).current_player_turn
-        else:
-            value = 0
-
-        if cc.game_ended(self.game, True):
-            return value
-
         while True:
-            legal_moves = cc.find_moves(self.game)
-            action = legal_moves[np.random.randint(0, high=len(legal_moves))]
-            cc.make_move(self.game, action[0], action[1])
-
-            if cc.is_checkmate(self.game):
-                value = (self.game).current_player_turn
+            if cc.in_check(self.game, "attack", "king pos") and (len(cc.find_moves(self.game)) == 0):
+                return (self.game).current_player_turn
             else:
                 value = 0
 
             if cc.game_ended(self.game, True):
                 return value
+            
+            legal_moves = cc.find_moves(self.game)
+            action = legal_moves[np.random.randint(0, high=len(legal_moves))]
+            cc.make_move(self.game, action[0], action[1])
             
     def backpropagate(self, value):
         self.value += value
